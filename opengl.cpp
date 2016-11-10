@@ -31,7 +31,7 @@ void display( void )
 
     // Draw the sun	-- as a yellow, wireframe sphere
     glColor3f( 1.0, 1.0, 0.0 );
-    glutWireSphere( 1.0, 15, 15 );
+    glutWireSphere( .5, 15, 15 );
 
     // Draw the Earth
     // First position it around the sun. Use DayOfYear to determine its position.
@@ -42,7 +42,7 @@ void display( void )
     glRotatef( 360.0 * HourOfDay / 24.0, 0.0, 1.0, 0.0 );
     // Third, draw the earth as a wireframe sphere.
     glColor3f( 0.2, 0.2, 1.0 );
-    glutWireSphere( 0.4, 10, 10 );
+    glutWireSphere( 1, 10, 10 );
     glPopMatrix();						// Restore matrix state
 
     // Draw the moon. Use DayOfYear to control its rotation around the earth

@@ -4,7 +4,7 @@
 class Planet 
 {
 	public:
-		Planet( float r, float d, float y, float da, string n );
+		Planet( float r, float d, float y, float da, float size, string n );
 		Planet();
 
 		// Getters
@@ -12,6 +12,7 @@ class Planet
 		float GetDistance();
 		float GetYear();
 		float GetDay();
+		float GetScaledSize();
 		string GetName();
 
 		// Setters
@@ -19,11 +20,13 @@ class Planet
 		void SetDistance( float d );
 		void SetYear( float y );
 		void SetDay( float d );
+		void SetScaledSize( float size );
 		void SetName( string n );
 	private:
 		float radius;
 		float distance;
 		float year;
 		float day;
+		float scaledSize;
 		string name;
 };

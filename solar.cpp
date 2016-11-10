@@ -16,16 +16,18 @@ void InitOpenGl()
 
 void CreatePlanetArray()
 {
-	Planet sun = Planet( 696000, 0, 0, 25, "Sun" );
-	Planet mercury = Planet( 2439, 58, 88, 1416, "Mercury" );
-	Planet venus = Planet( 6052, 108, 225, 5832, "Venus" );
-	Planet earth = Planet( 6378, 150, 365, 24, "Earth" );
-	Planet mars = Planet( 3394, 228, 687, 24.6, "Mars" );
-	Planet jupiter = Planet( 71398, 779, 4332, 9.8, "Jupiter" );
-	Planet saturn = Planet( 60270, 1424, 10761, 10.2, "Saturn" );
-	Planet uranus = Planet( 25550, 2867, 30682, 15.5, "Uranus" );
-	Planet neptune = Planet( 24750, 4493, 60195, 15.8, "Neptune" );
-	Planet moon = Planet( 1738, 0.384, 27.3, 27.3, "Moon" );
+	Planet sun = Planet( 696000, 0, 0, 25, 1, "Sun" );
+	float sunSize = sun.GetRadius();
+
+	Planet mercury = Planet( 2439, 58, 88, 1416, 2439.0/sunSize, "Mercury" );
+	Planet venus = Planet( 6052, 108, 225, 5832, 6052.0/sunSize, "Venus" );
+	Planet earth = Planet( 6378, 150, 365, 24, 6378.0/sunSize, "Earth" );
+	Planet mars = Planet( 3394, 228, 687, 24.6, 3394.0/sunSize, "Mars" );
+	Planet jupiter = Planet( 71398, 779, 4332, 9.8, 71398.0/sunSize, "Jupiter" );
+	Planet saturn = Planet( 60270, 1424, 10761, 10.2, 60270.0/sunSize, "Saturn" );
+	Planet uranus = Planet( 25550, 2867, 30682, 15.5, 25550.0/sunSize, "Uranus" );
+	Planet neptune = Planet( 24750, 4493, 60195, 15.8, 24750.0/sunSize, "Neptune" );
+	Planet moon = Planet( 1738, 0.384, 27.3, 27.3, 1, "Moon" );
 
 	Planets[0] = sun;
 	Planets[1] = mercury;
