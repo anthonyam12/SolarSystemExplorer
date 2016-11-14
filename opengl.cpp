@@ -19,7 +19,7 @@ void display( void )
 	float HourOfDay = 0;
 
 	// Back off eight units to be able to view from the origin.
-    glTranslatef ( 0.0, 0.0, -10.0 );
+    glTranslatef ( 0.0, 0.0, -100.0 );
 
     // Rotate the plane of the elliptic
     // (rotate the model's plane about the x axis by fifteen degrees)
@@ -27,7 +27,7 @@ void display( void )
 
     // Draw the sun	-- as a yellow, wireframe sphere
     glColor3f( 1.0, 1.0, 0.0 );
-    gluSphere( gluNewQuadric(), 1, 20, 20 );
+    gluSphere( gluNewQuadric(), 10, 20, 20 );
 
     // Draw the Earth
     // First position it around the sun. Use DayOfYear to determine its position.
@@ -55,7 +55,7 @@ void display( void )
 		cout << ((Planets[i].GetDistance()/based)*base)/div << endl;
 		//glPushMatrix();
 		//glTranslatef( ((Planets[i].GetDistance()/based)*base)/div, 0, 0 );
-		glTranslatef( 2.5, 0.0, 0.0 );
+		glTranslatef( 10, 0.0, 0.0 );
 		gluSphere( gluNewQuadric(), Planets[i].GetScaledSize(), 15, 15 );
 		//glPopMatrix();
 	}
@@ -82,7 +82,7 @@ void reshape( int w, int h )
     // else
     //    glOrtho( -clip * aspectRatio, clip * aspectRatio, -clip, clip, -10.0, 10.0 );
 	
-	gluPerspective( 100, aspectRatio, 1, 10 ); 
+	gluPerspective( 60, aspectRatio, -10, 10 ); 
     glMatrixMode( GL_MODELVIEW );
 }
 

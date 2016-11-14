@@ -56,6 +56,7 @@ void CreatePlanetArray()
 	{
 		if( Planets[i].GetScaledSize() > 1.0 )
 			Planets[i].SetScaledSize( 1.0 );
+		Planets[i].SetScaledSize( Planets[i].GetScaledSize() * 10 );
 	}
 }
 
