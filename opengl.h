@@ -1,15 +1,14 @@
-#include <GL/freeglut.h>
+#ifndef GLOBAL_H
+#define GLOBAL_H
 #include "global.h"
-#include "inputhandler.h"
+#endif
 
-/*******************************************************************************
- * 									Globals 								   *
- ******************************************************************************/
+// GLOBALS
+extern Planet Planets[10];
+extern int ScreenHeight;
+extern int ScreenWidth;
 
-
-/*******************************************************************************
- * 								Function Definitions 						   *
- ******************************************************************************/
+// FUNCTIONS
 // OpenGL Callbacks
 void keyboard( unsigned char key, int x, int y );
 void display( void );
@@ -17,5 +16,3 @@ void reshape( int w, int h );
 
 // Misc.
 void init();
-int GetScreenWidth();
-int GetScreenHeight();

@@ -1,5 +1,4 @@
-#include "planet.h"
-
+#include "global.h"
 
 Planet::Planet() {}
 
