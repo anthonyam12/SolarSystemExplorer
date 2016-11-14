@@ -19,7 +19,7 @@ void display( void )
 	float HourOfDay = 0;
 
 	// Back off eight units to be able to view from the origin.
-    //glTranslatef ( 0.0, 0.0, -8.0 );
+    glTranslatef ( 0.0, 0.0, -10.0 );
 
     // Rotate the plane of the elliptic
     // (rotate the model's plane about the x axis by fifteen degrees)
@@ -53,10 +53,11 @@ void display( void )
 	{
 		float div = i >=5 ? i : 1;
 		cout << ((Planets[i].GetDistance()/based)*base)/div << endl;
-		glPushMatrix();
-		glTranslatef( ((Planets[i].GetDistance()/based)*base)/div, 0, 0 );
-		gluSphere( gluNewQuadric(), Planets[i].GetScaledSize(), 20, 20 );
-		glPopMatrix();
+		//glPushMatrix();
+		//glTranslatef( ((Planets[i].GetDistance()/based)*base)/div, 0, 0 );
+		glTranslatef( 2.5, 0.0, 0.0 );
+		gluSphere( gluNewQuadric(), Planets[i].GetScaledSize(), 15, 15 );
+		//glPopMatrix();
 	}
 
 	glutSwapBuffers();
@@ -75,10 +76,13 @@ void reshape( int w, int h )
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    if ( w <= h )
-        glOrtho( -14.0, 14.0, -14.0 * aspectRatio, 14.0 * aspectRatio, -10.0, 10.0 );
-    else
-        glOrtho( -14.0 * aspectRatio, 14.0 * aspectRatio, -14.0, 14.0, -10.0, 10.0 ); 
+	float clip = .5;
+    //if ( w <= h )
+    //    glOrtho( -clip, clip, -clip * aspectRatio, clip * aspectRatio, -10.0, 10.0 );
+    // else
+    //    glOrtho( -clip * aspectRatio, clip * aspectRatio, -clip, clip, -10.0, 10.0 );
+	
+	gluPerspective( 100, aspectRatio, 1, 10 ); 
     glMatrixMode( GL_MODELVIEW );
 }
 
