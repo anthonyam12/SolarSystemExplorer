@@ -16,29 +16,30 @@ void InitOpenGl()
 
 void CreatePlanetArray()
 {
+	Color color;
+	color.r = 1.0; color.g = 1.0; color.b = 0.0;
 	// scale the sun down a bit
-	Planet sun = Planet( 36000, 0, 0, 25, 1, "Sun" );
-	float sunSize = sun.GetRadius();
+	Planet sun = Planet( 36000, 0, 0, 25, 1, "Sun", color );
+	float sunSize = sun.getRadius();
 
-	Planet mercury = Planet( 2439, 58, 88, 1416, 2439.0/sunSize, "Mercury" );
-	Planet venus = Planet( 6052, 108, 225, 5832, 6052.0/sunSize, "Venus" );
-	Planet earth = Planet( 6378, 150, 365, 24, 6378.0/sunSize, "Earth" );
-	Planet mars = Planet( 3394, 228, 687, 24.6, 3394.0/sunSize, "Mars" );
-	Planet jupiter = Planet( 71398, 779, 4332, 9.8, 71398.0/sunSize, "Jupiter" );
-	Planet saturn = Planet( 60270, 1424, 10761, 10.2, 60270.0/sunSize, "Saturn" );
-	Planet uranus = Planet( 25550, 2867, 30682, 15.5, 25550.0/sunSize, "Uranus" );
-	Planet neptune = Planet( 24750, 4493, 60195, 15.8, 24750.0/sunSize, "Neptune" );
-	Planet moon = Planet( 1738, 0.384, 27.3, 27.3, 1738.0/sunSize, "Moon" );
-
-//	Planet mercury = Planet( 2439, 58, 88, 1416, 1, "Mercury" );
-//	Planet venus = Planet( 6052, 108, 225, 5832, 1, "Venus" );
-//	Planet earth = Planet( 6378, 150, 365, 24, 1, "Earth" );
-//	Planet mars = Planet( 3394, 228, 687, 24.6, 1, "Mars" );
-//	Planet jupiter = Planet( 71398, 779, 4332, 9.8, 1, "Jupiter" );
-//	Planet saturn = Planet( 60270, 1424, 10761, 10.2, 1, "Saturn" );
-//	Planet uranus = Planet( 25550, 2867, 30682, 15.5, 1, "Uranus" );
-//	Planet neptune = Planet( 24750, 4493, 60195, 15.8, 1, "Neptune" );
-//	Planet moon = Planet( 1738, 0.384, 27.3, 27.3, 1, "Moon" );
+	color.r = .5843; color.g = .502; color.b = .502;
+	Planet mercury = Planet( 2439, 58, 88, 1416, 2439.0/sunSize, "Mercury", color );
+	color.r = .8627; color.g = .8; color.b = .3765;
+	Planet venus = Planet( 6052, 108, 225, 5832, 6052.0/sunSize, "Venus", color );
+	color.r = 0.0; color.g = 0.0; color.b = 1.0;
+	Planet earth = Planet( 6378, 150, 365, 24, 6378.0/sunSize, "Earth", color );
+	color.r = .5843; color.g = 0.0; color.b = 0.0;
+	Planet mars = Planet( 3394, 228, 687, 24.6, 3394.0/sunSize, "Mars", color );
+	color.r = 1.0; color.g = .3372; color.b = 0.0509;
+	Planet jupiter = Planet( 71398, 779, 4332, 9.8, 71398.0/sunSize, "Jupiter", color );
+	color.r = .8549; color.g = .6471; color.b = .1254;
+	Planet saturn = Planet( 60270, 1424, 10761, 10.2, 60270.0/sunSize, "Saturn", color );
+	color.r = 0.0; color.g = .749; color.b = 1.0;
+	Planet uranus = Planet( 25550, 2867, 30682, 15.5, 25550.0/sunSize, "Uranus", color );
+	color.r = .1176; color.g = .5647; color.b = 1.0;
+	Planet neptune = Planet( 24750, 4493, 60195, 15.8, 24750.0/sunSize, "Neptune", color );
+	color.r = .8039; color.g = .7882; color.b = .7882;
+	Planet moon = Planet( 1738, 0.384, 27.3, 27.3, 1738.0/sunSize, "Moon", color );
 
 	Planets[0] = sun;
 	Planets[1] = mercury;
@@ -54,9 +55,9 @@ void CreatePlanetArray()
 	// clip size
 	for( int i = 0; i < 10; i++ ) 
 	{
-		if( Planets[i].GetScaledSize() > 1.0 )
-			Planets[i].SetScaledSize( 1.0 );
-		Planets[i].SetScaledSize( Planets[i].GetScaledSize() * 10 );
+		if( Planets[i].getScaledSize() > 1.0 )
+			Planets[i].setScaledSize( 1.0 );
+		Planets[i].setScaledSize( Planets[i].getScaledSize() * 10 );
 	}
 }
 

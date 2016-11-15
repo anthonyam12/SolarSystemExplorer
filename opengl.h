@@ -7,6 +7,13 @@
 extern Planet Planets[10];
 extern int ScreenHeight;
 extern int ScreenWidth;
+extern Texture texture;
+
+const int Esc = 27;			// exit program
+const int s = 's'; 			// smooth shading
+const int f = 'f';			// flat shading
+const int w = 'w';			// wireframe
+const int t = 't';			// texture mapping
 
 // FUNCTIONS
 // OpenGL Callbacks
