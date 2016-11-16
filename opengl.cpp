@@ -10,6 +10,8 @@ void keyboard( unsigned char key, int x, int y )
 	// f - flat shading
 	// w - wireframe
 	// t - texture mapping
+	// + - zoom in
+	// - - zoom out
 	switch( key ) 
 	{
 		case s:
@@ -24,8 +26,38 @@ void keyboard( unsigned char key, int x, int y )
 		case t:
 			texture = TextureMap;
 			break;
+		case Plus:
+			CamZ += 5;
+			break;
+		case Minus:
+			CamZ -= 5;
+			break;
 		case Esc:
 			exit( 0 );
+			break;
+	}
+	glutPostRedisplay();
+}
+
+void special( int key, int x, int y )
+{
+	// up - pan up (+y)
+	// down - pan down (-y)
+	// left - pan left
+	// right - pan right
+	switch( key )
+	{
+		case GLUT_KEY_UP:
+			CamY -= 2.0;
+			break;
+		case GLUT_KEY_DOWN:
+			CamY += 2.0;
+			break;
+		case GLUT_KEY_RIGHT:
+			CamX -= 2.0;
+			break;
+		case GLUT_KEY_LEFT:
+			CamX += 2.0;
 			break;
 	}
 	glutPostRedisplay();
@@ -55,30 +87,11 @@ void display( void )
 			break;
 	}
 
-	// Back off eight units to be able to view from the origin.
-    glTranslatef ( 0.0, 0.0, -100.0 );
+	// back off of origin to see scene
+    glTranslatef ( CamX, CamY, CamZ );
 
     // Rotate the plane of the elliptic
-    // (rotate the model's plane about the x axis by fifteen degrees)
     glRotatef( 15.0, 1.0, 0.0, 0.0 );
-
-    // Draw the Earth
-    // First position it around the sun. Use DayOfYear to determine its position.
-    //glRotatef( 360.0 * DayOfYear / 365.0, 0.0, 1.0, 0.0 );
-	glPushMatrix();
-    glTranslatef( Planets[3].getDistance()/50, 0.0, 0.0 );
-    // Second, rotate the earth on its axis. Use HourOfDay to determine its rotation.
-    //glRotatef( 360.0 * HourOfDay / 24.0, 0.0, 1.0, 0.0 );
-    // Third, draw the earth as a wireframe sphere.
-    glColor3f( 0.2, 0.2, 1.0 );
-    //glutWireSphere( Planets[3].GetScaledSize(), 10, 10 );
-    glPopMatrix();						// Restore matrix state
-
-	// Draw the moon. Use DayOfYear to control its rotation around the earth
-//    glRotatef( 360.0 * 12.0 * DayOfYear / 365.0, 0.0, 1.0, 0.0 );
-//    glTranslatef( 0.7, 0.0, 0.0 );
-//    glColor3f( 0.3, 0.7, 0.3 );
-//    glutWireSphere( 0.1, 5, 5 );
 
 	for( int i = 8; i >= 1; i-- )
 	{
@@ -87,16 +100,30 @@ void display( void )
 		p.dayOfYear = p.dayOfYear + (p.animateIncrement / p.getDay());
 		p.hourOfDay = p.hourOfDay - ( (int)( p.hourOfDay / p.getDay() ) ) * p.getDay();
 		p.dayOfYear = p.dayOfYear - ( (int)( p.dayOfYear / p.getYear() ) ) * p.getYear();
-
+		
+		glClear( GL_DEPTH_BUFFER_BIT );
 		// need to specify normals in here for smooth shading
 		Color c = p.getColor();
 		glColor3f( c.r, c.g, c.b ); 
 		glPushMatrix(); 
 			glRotatef( 360.0 * p.dayOfYear / p.getYear(), 0.0, 1.0, 0.0 );
-			glRotatef( 360.0 * p.hourOfDay / p.getDay(), 0.0, 1.0, 0.0 );
 			glTranslatef( 15*i, 0.0, 0.0 );
-			gluSphere( gluNewQuadric(), p.getScaledSize(), 15, 15 );
-		glPopMatrix();
+			if( p.getName() == "Earth" )
+				glPushMatrix();
+			glRotatef( 360.0 * p.hourOfDay / p.getDay(), 0.0, 1.0, 0.0 );
+			gluSphere( gluNewQuadric(), p.getScaledSize(), 15, 15 );	
+			// draw the moon if earth
+			if( p.getName() == "Earth" )
+			{
+				glPopMatrix();
+	    		glRotatef( 360.0 * 12.0 * p.dayOfYear / 365.0, 0.0, 1.0, 0.0 );
+		   	 	glTranslatef( p.getScaledSize() + 0.7, 0.0, 0.0 );
+				Planet moon = Planets[9];
+				Color mc = moon.getColor();
+				glColor3f( mc.r, mc.g, mc.b );
+    			gluSphere( gluNewQuadric(), moon.getScaledSize(), 10, 10 );
+			}
+		glPopMatrix();	
 	}
 
     // Draw the sun	-- as a yellow, wireframe sphere
@@ -143,6 +170,7 @@ void init()
 
 	// callbacks
 	glutDisplayFunc( display );
+	glutSpecialFunc( special );
 	glutReshapeFunc( reshape );
 	glutKeyboardFunc( keyboard );
 
