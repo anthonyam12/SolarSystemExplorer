@@ -82,6 +82,24 @@ void keyboard( unsigned char key, int x, int y )
 			if( Paused || SingleStep )
 				PreviousMult /= 2;
 			break;
+		case X:
+			RotateX -= 1.0;
+			break;
+		case xx:
+			RotateX += 1.0;
+			break;
+		case Y:
+			RotateY += 1.0;
+			break;
+		case yy:
+			RotateY -= 1.0;
+			break;
+		case Z:
+			RotateZ += 1.0;
+			break;
+		case z:
+			RotateZ -= 1.0;
+			break;
 		case Esc:
 			exit( 0 );
 			break;
@@ -159,7 +177,9 @@ void display( void )
     glTranslatef ( CamX, CamY, CamZ );
 
     // Rotate the plane of the elliptic
-    glRotatef( 15.0, 1.0, 0.0, 0.0 );
+    glRotatef( RotateX, 0.0, 1.0, 0.0 );
+	glRotatef( RotateY, 1.0, 0.0, 0.0 );
+	glRotatef( RotateZ, 0.0, 0.0, 1.0 );
 
 	for( int i = 8; i >= 1; i-- )
 	{

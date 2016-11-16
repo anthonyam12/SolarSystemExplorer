@@ -75,6 +75,9 @@ float IncrementMult = 1.0;
 bool SingleStep = false;
 bool Paused = false;
 float PreviousMult = 1.0;
+float RotateX = 0.0;
+float RotateY = 15.0;
+float RotateZ = 0.0;
 
 Planet Planets[10];
 Texture texture;
