@@ -1,9 +1,8 @@
 /*
-	***** bmpRead.cpp *****
+	***** bmpRead.cc *****
 
 Code to read in a BMP image file.
-
-CSC433/533 Computer Graphics - Fall 2016
+Written for CSC433/533 Computer Graphics PA#3.
 
 Author: John M. Weiss, Ph.D.
 Written March 23, 2006.

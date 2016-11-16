@@ -8,6 +8,7 @@ extern Planet Planets[10];
 extern int ScreenHeight;
 extern int ScreenWidth;
 extern Texture texture;
+extern GLuint textureNames[10];
 
 const int Esc = 27;			// exit program
 const int s = 's'; 			// smooth shading
@@ -23,3 +24,4 @@ void reshape( int w, int h );
 
 // Misc.
 void init();
+void SetupTextureMapping();

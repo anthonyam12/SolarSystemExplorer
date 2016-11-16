@@ -59,6 +59,35 @@ void CreatePlanetArray()
 			Planets[i].setScaledSize( 1.0 );
 		Planets[i].setScaledSize( Planets[i].getScaledSize() * 10 );
 	}
+
+	SetPlanetBitmaps();
 }
 
+void SetPlanetBitmaps() 
+{
+	unsigned char* img;
+	int rows;
+	int cols;
+
+	LoadBmpFile( "img/sun.bmp", rows, cols, img );
+	Planets[0].setImage( img, rows, cols );
+	LoadBmpFile( "img/mercury.bmp", rows, cols, img );
+	Planets[1].setImage( img, rows, cols );
+	LoadBmpFile( "img/venus.bmp", rows, cols, img );
+	Planets[2].setImage( img, rows, cols );
+	LoadBmpFile( "img/earth.bmp", rows, cols, img );
+	Planets[3].setImage( img, rows, cols );
+	LoadBmpFile( "img/mars.bmp", rows, cols, img );
+	Planets[4].setImage( img, rows, cols );
+	LoadBmpFile( "img/jupiter.bmp", rows, cols, img );
+	Planets[5].setImage( img, rows, cols );
+	LoadBmpFile( "img/saturn.bmp", rows, cols, img );
+	Planets[6].setImage( img, rows, cols );
+	LoadBmpFile( "img/uranus.bmp", rows, cols, img );
+	Planets[7].setImage( img, rows, cols );
+	LoadBmpFile( "img/neptune.bmp", rows, cols, img );
+	Planets[8].setImage( img, rows, cols );
+	LoadBmpFile( "img/moon.bmp", rows, cols, img );
+	Planets[9].setImage( img, rows, cols );
+}
 

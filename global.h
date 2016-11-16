@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <stdio.h>			// files
 #include <GL/freeglut.h>
 
 using namespace std;
@@ -9,6 +10,13 @@ struct Color
 	float r;
 	float g;
 	float b;
+};
+
+struct Image 
+{
+	int rows;
+	int cols;
+	unsigned char* ptr;
 };
 
 class Planet 
@@ -25,6 +33,7 @@ class Planet
 		float getScaledSize();
 		Color getColor();
 		string getName();
+		Image getImage();
 
 		// Setters
 		void setRadius( float r );
@@ -34,6 +43,12 @@ class Planet
 		void setScaledSize( float size );
 		void setName( string n );
 		void setColor( Color c );
+		void setImage( unsigned char* i, int r, int c );
+
+		// public update vars
+		float hourOfDay;
+		float dayOfYear;
+		float animateIncrement;
 	private:
 		float radius;
 		float distance;
@@ -42,6 +57,7 @@ class Planet
 		float scaledSize;
 		Color color;
 		string name;
+		Image img;
 };
 
 enum Texture { Wireframe, Flat, Smooth, TextureMap };
@@ -53,4 +69,5 @@ int ScreenHeight = 600;
 
 Planet Planets[10];
 Texture texture;
+GLuint textureNames[10];
 #endif 

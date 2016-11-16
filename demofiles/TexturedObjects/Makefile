@@ -1,8 +1,16 @@
+# Makefile for OpenGL/GLUT programs.
+
+# Author: John M. Weiss, Ph.D.
+# Written Fall 2016 for CSC433/533 Computer Graphics.
+
+# Usage:  make target1 target2 ...
+
+#-----------------------------------------------------------------------
+
 # GNU C/C++ compiler and linker:
 CC = gcc
 CXX = g++
 LINK = g++
-CU = nvcc
 
 # Turn on optimization and warnings (add -g for debugging with gdb):
 # CPPFLAGS = 		# preprocessor flags
@@ -20,24 +28,17 @@ GL_LIBS = -lglut -lGLU -lGL -lm
 # GL_LIBS = opengl32.lib glu32.lib freeglut.lib
 # GL_LIBS = opengl32.lib glu32.lib glut32.lib
 
+SRC = cube.o display.cpp events.cpp main.cpp textures.cpp
+OBJ = cube.o display.o events.o main.o textures.o
+
 #-----------------------------------------------------------------------
 
 # MAKE allows the use of "wildcards", to make writing compilation instructions
 # a bit easier. GNU make uses $@ for the target and $^ for the dependencies.
 
-all:    solar
-
-opengl: opengl.o
+# specific targets
+TexturedObjects:	$(OBJ) bmpRead.o
 	$(LINK) -o $@ $^ $(GL_LIBS)
-
-planet: planet.o
-	$(LINK) -o $@ $^ $(GL_LIBS)
-
-bmpRead.o:
-	$(LINK) -o $@ $^ -c $(GL_LIBS) bmpRead.cpp
-
-solar: planet.o opengl.o bmpRead.o
-	$(LINK) -o $@ $^ solar.cpp $(GL_LIBS)
 
 # generic C and C++ targets for OpenGL programs consisting of only one file
 # type "make filename" (no extension) to build
@@ -47,11 +48,6 @@ solar: planet.o opengl.o bmpRead.o
 .cpp:
 	$(CXX) -o $@ $@.cpp $(CXXFLAGS) $(GL_LIBS)
 
-.cu:
-	$(CU) -o $@ $@.cu 
-
-
 # utility targets
 clean:
 	rm -f *.o *~ core
-	rm -f solar

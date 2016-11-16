@@ -138,7 +138,7 @@ void Animate( void )
         HourOfDay = HourOfDay - ( ( int ) ( HourOfDay / 24 ) ) * 24;
         DayOfYear = DayOfYear - ( ( int ) ( DayOfYear / 365 ) ) * 365;
     }
-
+	cout << AnimateIncrement << endl;
     // Clear the current matrix (Modelview)
     glLoadIdentity();
 
@@ -173,7 +173,7 @@ void Animate( void )
     glutWireSphere( 0.1, 5, 5 );
 	glPopMatrix();
 
-	
+		
     glTranslatef( 7, 0.0, 0.0 );
     glColor3f( 0.3, 0.7, 1.0 );
     glutWireSphere( 1, 50, 50 );
@@ -211,8 +211,6 @@ void ResizeWindow( int w, int h )
     // Set up the projection view matrix (not very well!)
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-	cout << aspectRatio << endl;
-    //gluPerspective( 60.0, aspectRatio, 1.0, 30.0 );
 	 if ( w <= h )
         glOrtho( -18.0, 18.0, -18.0 * aspectRatio, 18.0 * aspectRatio, -10.0, 10.0 );
     else
