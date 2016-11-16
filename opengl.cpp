@@ -122,7 +122,8 @@ void mouseclick( int button, int state, int x, int y )
 		CamZ += 5.0;
 	if( button == 4 )
 		CamZ -= 5.0;
-	cout << button << endl;
+
+	glutPostRedisplay();
 }
 
 void special( int key, int x, int y )

@@ -2,7 +2,9 @@
 
 int main(int argc, char*argv[])
 {
+	srand( time( NULL ) );
 	CreatePlanetArray();
+	InitPlanetOrbitPosition();
 
 	glutInit( &argc, argv );
 	InitOpenGl();
@@ -91,3 +93,13 @@ void SetPlanetBitmaps()
 	Planets[9].setImage( img, rows, cols );
 }
 
+
+void InitPlanetOrbitPosition()
+{
+	// planet max is it's 'year' max days per year
+	for( int i = 1; i < 9; i++ )
+	{
+		Planet &p = Planets[i];
+		p.dayOfYear = rand() % (int)p.getYear();
+	}
+}

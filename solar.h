@@ -14,6 +14,7 @@ extern int ScreenWidth;
 void InitOpenGl();
 void CreatePlanetArray();
 void SetPlanetBitmaps();
+void InitPlanetOrbitPosition();
 
 // ext. functions
 bool LoadBmpFile( const char* filename, int &rows, int &cols, unsigned char* &imgPtr );

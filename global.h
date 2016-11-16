@@ -1,6 +1,8 @@
 #include <string>
 #include <iostream>
 #include <stdio.h>			// files
+#include <stdlib.h>			// random
+#include <time.h>			// random seed
 #include <GL/freeglut.h>
 
 using namespace std;
