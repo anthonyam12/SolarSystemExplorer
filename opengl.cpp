@@ -1,5 +1,13 @@
 #include "opengl.h"
 
+/***
+*
+* NOTE!!!!!!!!!!!!!!! IF this file becomes > 500 lines, move the input handling
+* to another class/cpp file. Since most things modified are global this should
+* be no problem. We would just cut and paste the openGL callbacks to another 
+* file/class and set the functions differently in init().
+*
+*/
 
 /*******************************************************************************
  * 								OpenGL Callbacks 							   *
@@ -26,17 +34,34 @@ void keyboard( unsigned char key, int x, int y )
 		case t:
 			texture = TextureMap;
 			break;
-		case Plus:
+		case o:
+			CamZ -= 5;
+			break;
+		case i:
 			CamZ += 5;
 			break;
+		case Plus:
+			IncrementMult = IncrementMult == 0 ? .25 : 
+							IncrementMult * 2;
+			break;
 		case Minus:
-			CamZ -= 5;
+			IncrementMult /= 2.0;
 			break;
 		case Esc:
 			exit( 0 );
 			break;
 	}
 	glutPostRedisplay();
+}
+
+void mouseclick( int button, int state, int x, int y )
+{
+	// mouse wheel in - zoom in
+	// mouse wheel out - zoom out
+	if( button == 3 ) // mouse wheel 'in', zoom in
+		CamZ += 5.0;
+	if( button == 4 )
+		CamZ -= 5.0;
 }
 
 void special( int key, int x, int y )
@@ -96,8 +121,9 @@ void display( void )
 	for( int i = 8; i >= 1; i-- )
 	{
 		Planet &p = Planets[i];
-		p.hourOfDay += p.animateIncrement;
-		p.dayOfYear = p.dayOfYear + (p.animateIncrement / p.getDay());
+		// select multiplier to prevent ridiculous spinning
+		p.hourOfDay += p.animateIncrement*(IncrementMult > 0.25 ? IncrementMult : 0.5);
+		p.dayOfYear = p.dayOfYear + ((p.animateIncrement*IncrementMult) / p.getDay());
 		p.hourOfDay = p.hourOfDay - ( (int)( p.hourOfDay / p.getDay() ) ) * p.getDay();
 		p.dayOfYear = p.dayOfYear - ( (int)( p.dayOfYear / p.getYear() ) ) * p.getYear();
 		
@@ -184,7 +210,7 @@ void init()
 
 	SetupTextureMapping();
 
-	texture = Flat;
+	texture = Wireframe;
 }
 
 void SetupTextureMapping()

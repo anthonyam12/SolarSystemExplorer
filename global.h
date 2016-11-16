@@ -71,6 +71,7 @@ int ScreenHeight = 600;
 float CamZ = -100.0;
 float CamY = 0.0;
 float CamX = 0.0;
+float IncrementMult = 1.0;
 
 Planet Planets[10];
 Texture texture;
