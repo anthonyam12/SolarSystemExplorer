@@ -13,16 +13,22 @@ extern float CamZ;
 extern float CamY;
 extern float CamX;
 extern float IncrementMult;
+extern float PreviousMult;
+extern bool SingleStep;
+extern bool Paused;
+extern bool NonMove;
 
 const int Esc = 27;			// exit program
 const int s = 's'; 			// smooth shading
 const int f = 'f';			// flat shading
 const int w = 'w';			// wireframe
 const int t = 't';			// texture mapping
-const int i = 'i';			// zoom (i)n
-const int o = 'o';			// zoom (o)ut
-const int Plus = '+';		// speed up animation
-const int Minus = '-';		// slow down animation
+const int r = 'r';			// resume/stop simulation
+const int a = 'a';			// slow down animation
+const int A = 'A';			// speed up animation
+const int Space = ' ';		// single step
+const int Plus = '+';		// zoom in
+const int Minus = '-';		// zoom out
 
 // FUNCTIONS
 // OpenGL Callbacks

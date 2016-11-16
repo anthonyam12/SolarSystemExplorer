@@ -14,19 +14,32 @@
  ******************************************************************************/
 void keyboard( unsigned char key, int x, int y )
 {
-	// s - smooth shading
-	// f - flat shading
+	// s - single step
+	// f - flat/smooth shading toggle
 	// w - wireframe
 	// t - texture mapping
+	// r - pause/resume
+	// A/a - speed up/down animation
+	// ' ' - single step step
 	// + - zoom in
 	// - - zoom out
 	switch( key ) 
 	{
 		case s:
-			texture = Smooth;
+			if ( !Paused )
+			{
+				SingleStep = !SingleStep;
+				if ( SingleStep )
+					PreviousMult = IncrementMult;
+				else
+					IncrementMult = PreviousMult;
+			}
 			break;
 		case f:
-			texture = Flat;
+			if ( texture == Flat )
+				texture = Smooth;
+			else 
+				texture = Flat;
 			break;
 		case w:
 			texture = Wireframe;
@@ -34,23 +47,52 @@ void keyboard( unsigned char key, int x, int y )
 		case t:
 			texture = TextureMap;
 			break;
-		case o:
+		case Minus:
 			CamZ -= 5;
 			break;
-		case i:
+		case Plus:
 			CamZ += 5;
 			break;
-		case Plus:
+		case r:
+			if ( !SingleStep )
+			{
+				Paused = !Paused;
+				if ( Paused )
+				{
+					PreviousMult = IncrementMult;
+					IncrementMult = 0.0;
+				}
+				else
+					IncrementMult = PreviousMult;
+			}
+			break;
+		case Space:
+			break;
+		case A:
 			IncrementMult = IncrementMult == 0 ? .25 : 
 							IncrementMult * 2;
+			if ( Paused || SingleStep )
+			{
+				PreviousMult = PreviousMult == 0 ? .25 : 
+							   PreviousMult * 2;
+			}
 			break;
-		case Minus:
+		case a:
 			IncrementMult /= 2.0;
+			if( Paused || SingleStep )
+				PreviousMult /= 2;
 			break;
 		case Esc:
 			exit( 0 );
 			break;
 	}
+	// funky logic to be able to change the simulation attributes
+	// without taking a 'step' 
+	if ( ( SingleStep && key != Space ) || Paused )
+		IncrementMult = 0.0;
+	else if ( SingleStep )
+		IncrementMult = PreviousMult;
+
 	glutPostRedisplay();
 }
 
@@ -62,6 +104,7 @@ void mouseclick( int button, int state, int x, int y )
 		CamZ += 5.0;
 	if( button == 4 )
 		CamZ -= 5.0;
+	cout << button << endl;
 }
 
 void special( int key, int x, int y )
@@ -126,14 +169,15 @@ void display( void )
 		p.dayOfYear = p.dayOfYear + ((p.animateIncrement*IncrementMult) / p.getDay());
 		p.hourOfDay = p.hourOfDay - ( (int)( p.hourOfDay / p.getDay() ) ) * p.getDay();
 		p.dayOfYear = p.dayOfYear - ( (int)( p.dayOfYear / p.getYear() ) ) * p.getYear();
-		
+
+		// Make closer objects on top of not closer objects		
 		glClear( GL_DEPTH_BUFFER_BIT );
 		// need to specify normals in here for smooth shading
 		Color c = p.getColor();
 		glColor3f( c.r, c.g, c.b ); 
 		glPushMatrix(); 
 			glRotatef( 360.0 * p.dayOfYear / p.getYear(), 0.0, 1.0, 0.0 );
-			glTranslatef( 15*i, 0.0, 0.0 );
+			glTranslatef( p.getDistance()/100 + (30*i), 0.0, 0.0 );
 			if( p.getName() == "Earth" )
 				glPushMatrix();
 			glRotatef( 360.0 * p.hourOfDay / p.getDay(), 0.0, 1.0, 0.0 );
@@ -155,10 +199,12 @@ void display( void )
     // Draw the sun	-- as a yellow, wireframe sphere
 	glClear( GL_DEPTH_BUFFER_BIT );
     glColor3f( 1.0, 1.0, 0.0 );
-    gluSphere( gluNewQuadric(), 10, 20, 20 );
+    gluSphere( gluNewQuadric(), 20, 20, 20 );
 
 	glutSwapBuffers();
-	glutPostRedisplay();
+
+	if ( !SingleStep && !Paused )
+		glutPostRedisplay();
 }
 
 void reshape( int w, int h )
