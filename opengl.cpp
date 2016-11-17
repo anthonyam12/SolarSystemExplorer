@@ -15,6 +15,34 @@ bool LoadBmpFile( const char* filename, int &rows, int &cols, unsigned char* &im
 /*******************************************************************************
  * 								OpenGL Callbacks 							   *
  ******************************************************************************/
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief OpenGL callback to handle standard keyboard input
+*
+* The OpenGL callback to handle keyboard input. The keyboard input is mapped as
+* follows:
+*		s - toggles 'single step' mode in which the user can step through the simulation
+*		<space> - takes a step while in single step mode
+*		r - toggles pause 
+*		f - toggles flat/smooth shading
+*		w - switches celestial objects to wireframe spheres
+*		t - maps images of the planets to the planets
+*		A/a - 'A' speeds up the simulation, 'a' slows down the simulation
+*		+/- - zoom in and out 
+*		X/x Y/y Z/z - rotate the solar system about the x,y, and z axes, respectively
+*		l - toggles the lights 
+*
+* If we are in Single Step or Pause mode the disply is redrawn but with no 
+* movement of the planets. Otherwise doing things like animating or changing
+* textures would now work while in these modes OR would cause us to take a 
+* 'step' in the simulation, which is not desired.
+*
+* \params 
+*		key - the key value pressed
+*		x - x position of key press
+*		y - y position of key press
+* \return none
+*******************************************************************************/
 void keyboard( unsigned char key, int x, int y )
 {
 	// s - single step
@@ -26,6 +54,7 @@ void keyboard( unsigned char key, int x, int y )
 	// ' ' - single step step
 	// + - zoom in
 	// - - zoom out
+	// X/x, Y/y, Z/z - rotate the simulation
 	switch( key ) 
 	{
 		case s:
@@ -125,6 +154,21 @@ void keyboard( unsigned char key, int x, int y )
 	glutPostRedisplay();
 }
 
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Handles mouse input
+*
+* Handles input from the mouse's buttons. Interactions are mapped as
+*		mouse wheel out/down - zoom out 
+*		mouse wheel up/in - zoom in 
+*
+* \params 
+*		button - the mouse button pressed
+*		state - pressed/released etc
+*		x - x position of the mouse click
+*		y - y position of the mouse click
+* \return none
+*******************************************************************************/
 void mouseclick( int button, int state, int x, int y )
 {
 	// mouse wheel in - zoom in
@@ -137,6 +181,19 @@ void mouseclick( int button, int state, int x, int y )
 	glutPostRedisplay();
 }
 
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Handles input from 'special' key presses
+*
+* In our case the only special keys handled are up, down, left, and right arrow
+* keys. These keys are used to pan up, down, left, and right. 
+*
+* \params 
+*		key - values of key pressed
+*		x - x position of key press
+*		y - y position of key press
+* \return none
+*******************************************************************************/
 void special( int key, int x, int y )
 {
 	// up - pan up (+y)
@@ -161,12 +218,30 @@ void special( int key, int x, int y )
 	glutPostRedisplay();
 }
 
+
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Draws the current simulation state
+*
+* Determines how we want to texture our objects then draws the objects in the
+* simulation. As part of the object display we set the rotation and translation
+* of each planet. The translation defines where in the solar system the object
+* will be drawn, this is dependent on the planet's distance from the sun (except
+* for the moon and saturn rings).
+*
+* At the end of the method we request the display method be called again so that
+* the simulation is constantly being updated. 
+*
+* \params none
+* \return none
+*******************************************************************************/
 void display( void )
 {
 	glLoadIdentity();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-	// Might make this a function
+	
+	// sets the OpenGL attributes we need set depending on
+	// how we want to texture our objects
 	switch( texture )
 	{
 		case Wireframe:
@@ -189,26 +264,30 @@ void display( void )
 			break;
 	}
 
-	// back off of origin to see scene
+	// set the position of the scene
     glTranslatef ( CamX, CamY, CamZ );
 
-    // Rotate the plane of the elliptic
+    // Rotate around the scene based on user input
     glRotatef( RotateX, 0.0, 1.0, 0.0 );
 	glRotatef( RotateY, 1.0, 0.0, 0.0 );
 	glRotatef( RotateZ, 0.0, 0.0, 1.0 );
 	
+	// for each celestial object that isn't the sun or moon
+	// drawn in reverse order so further objects are behind closer ones
 	for( int i = 8; i >= 1; i-- )
 	{
 		GLUquadric *quad = gluNewQuadric();
 		Planet &p = Planets[i];
+
 		// select multiplier to prevent ridiculous spinning
 		p.hourOfDay += p.animateIncrement*(IncrementMult > 0.25 ? IncrementMult : 0.5);
 		p.dayOfYear = p.dayOfYear + ((p.animateIncrement*IncrementMult) / p.getDay());
 		p.hourOfDay = p.hourOfDay - ( (int)( p.hourOfDay / p.getDay() ) ) * p.getDay();
 		p.dayOfYear = p.dayOfYear - ( (int)( p.dayOfYear / p.getYear() ) ) * p.getYear();
 
-		// Make closer objects on top of not closer objects		
+		// Make closer objects on top of further objects		
 		glClear( GL_DEPTH_BUFFER_BIT );
+
 		// need to specify normals in here for smooth shading
 		if ( texture != TextureMap )
 		{
@@ -217,6 +296,7 @@ void display( void )
 		}
 		else 
 		{
+			// map the BMPs to the planets if in TextureMap mode
 			unsigned char* img = p.getImage().ptr;
 			int nrows = p.getImage().rows, ncols = p.getImage().cols;
 			gluQuadricTexture (quad, GL_TRUE);
@@ -224,28 +304,49 @@ void display( void )
 						  GL_RGB, GL_UNSIGNED_BYTE, img );
 			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 		}
+
+		// preserve the state so these operations only affect the current planet
 		glPushMatrix(); 
+			// rotate planet around the sun
 			glRotatef( 360.0 * p.dayOfYear / p.getYear(), 0.0, 1.0, 0.0 );
+			// move a distance from the sun
 			glTranslatef( p.getDistance()/100 + (30*i), 0.0, 0.0 );
+			// if we're the earth preserve the state again as to not affect the moon
 			if( p.getName() == "Earth" )
 				glPushMatrix();
+			// rotation on the planet's axis
 			glRotatef( 360.0 * p.hourOfDay / p.getDay(), 0.0, 1.0, 0.0 );
 			gluSphere( quad, p.getScaledSize(), 15, 15 );	
 			// draw the moon if earth
 			if( p.getName() == "Earth" )
 			{
 				glPopMatrix();
+				GLUquadric *moonq = gluNewQuadric();
 	    		glRotatef( 360.0 * 12.0 * p.dayOfYear / 365.0, 0.0, 1.0, 0.0 );
 		   	 	glTranslatef( p.getScaledSize() + 1.1, 0.0, 0.0 );
 				Planet moon = Planets[9];
-				Color mc = moon.getColor();
-				glColor3f( mc.r, mc.g, mc.b );
-    			gluSphere( gluNewQuadric(), moon.getScaledSize(), 10, 10 );
+				// handle moons texture
+				if( texture != TextureMap )
+				{
+					Color mc = moon.getColor();
+					glColor3f( mc.r, mc.g, mc.b );
+				}
+				else 
+				{	
+					unsigned char* img = moon.getImage().ptr;
+					int nrows = moon.getImage().rows, ncols = moon.getImage().cols;
+					gluQuadricTexture (moonq, GL_TRUE);
+					glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
+								  GL_RGB, GL_UNSIGNED_BYTE, img );
+					glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+				}
+    			gluSphere( moonq, moon.getScaledSize(), 10, 10 );
 			}
+		// restore original state
 		glPopMatrix();	
 	}
 
-    // Draw the sun	-- as a yellow, wireframe sphere
+    // Draw the sun	depending on current texture mode
 	glClear( GL_DEPTH_BUFFER_BIT );
 	GLUquadric *quad = gluNewQuadric();
 	if( texture != TextureMap )
@@ -263,32 +364,54 @@ void display( void )
 		glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	}
     gluSphere( quad, 20, 20, 20 );
-	glutSwapBuffers();
 
+	glutSwapBuffers();
+	
+	// if we're not paused or in single step mode redraw display
 	if ( !SingleStep && !Paused )
 		glutPostRedisplay();
 }
 
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief OpenGL callback to handle window reshaping
+*
+* Adjusts our camera perspective based on the new window's width and height.
+*
+* \params 
+*		w - new window width
+*		h - new window height
+* \return none
+*******************************************************************************/
 void reshape( int w, int h )
 {
-	ScreenWidth = w;
-	ScreenHeight = h;
-
  	float aspectRatio;
     h = ( h == 0 ) ? 1 : h;
     w = ( w == 0 ) ? 1 : w;
     glViewport( 0, 0, w, h );
     aspectRatio = ( float ) w / ( float ) h;
 
+	// adjust projection based on new screen size
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();	
 	gluPerspective( 60, aspectRatio, -100, 1 ); 
+	
     glMatrixMode( GL_MODELVIEW );
 }
 
 /*******************************************************************************
  * 									Misc.									   *
  ******************************************************************************/
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Initialize our simulation (mostly the OpenGL components)
+*
+* Initialzie OpenGL attributes such as the window attributes and certain att.
+* we need to properly draw and texture the celestial objects. 
+*
+* \params none
+* \return none
+*******************************************************************************/
 void init() 
 {
 	glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
@@ -296,7 +419,7 @@ void init()
 	// window settings 
 	glutInitWindowSize( ScreenWidth, ScreenHeight );
 	glutInitWindowPosition( 200, 200 );
-	glutCreateWindow( "Solar System" );
+	glutCreateWindow( "Solar System Simulation" );
 	
 	// clear screen color - black
 	glClearColor( 0.0, 0.0, 0.0, 0.0 );
@@ -307,21 +430,37 @@ void init()
 	glutSpecialFunc( special );
 	glutReshapeFunc( reshape );
 	glutKeyboardFunc( keyboard );
-
+	
+	// enable texture tpye attributes
 	glEnable( GL_NORMALIZE );
 	glEnable( GL_DEPTH_TEST );
     glEnable( GL_TEXTURE_2D );
 
+	// setups some params for texture mapping
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-;
+
+	// create the light sources
 	CreateLights();
 
+	// init to the wireframe model
 	texture = Wireframe;
 }
 
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Creates the light sources for our simulation
+*
+* Creates the light sources in the simulation. There are two primary light 
+* sources used. Ambient light throught the entire scene and the sun. The sun
+* emits primarily yellow light but some blue is included so Neptune and Uranus
+* aren't green. 
+*
+* \params none
+* \return none
+*******************************************************************************/
 void CreateLights()
 {
 	// enable lighting	
@@ -341,6 +480,8 @@ void CreateLights()
 	GLfloat ld[4] = { 1.0, 1.0, 0.5, 1.0 }; // diffuse light
 	GLfloat ls[4] = { 0.0, 0.0, 0.0, 1.0 }; // specular light
 	GLfloat lp[4] = { 0.0, 0.0, 0.0, 1.0 }; // light position
+
+	// create sun light source
 	glLightfv( GL_LIGHT0, GL_AMBIENT, la );
 	glLightfv( GL_LIGHT0, GL_DIFFUSE, ld );
 	glLightfv( GL_LIGHT0, GL_SPECULAR, ls );

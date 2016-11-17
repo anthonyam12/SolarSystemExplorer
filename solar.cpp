@@ -1,29 +1,108 @@
+/*******************************************************************************
+* Authors: Anthony Morast, Samuel Carroll
+* Date: 11/18/2016
+* 
+* CSC - 533 Computer Graphics, Dr. John Weiss
+* Program 3 - Solar System Simulation
+*
+* Usage:
+* 	solar
+* 
+* Description:
+*	A simulation of the solar system including the Sun, Earth's moon, and the 8 
+* planets; Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune. 
+* The planets all orbit the sun and revolve on their own axes while Earth's
+* moon revolves around the Earth. Also drawn are the rings of Saturn. 
+*	
+* The following is a key mapping for user inputs, 
+*		s - toggles 'single step' mode in which the user can step through the simulation
+*		<space> - takes a step while in single step mode
+*		r - toggles pause 
+*		f - toggles flat/smooth shading
+*		w - switches celestial objects to wireframe spheres
+*		t - maps images of the planets to the planets
+*		A/a - 'A' speeds up the simulation, 'a' slows down the simulation
+*		+/- - zoom in and out 
+*		X/x Y/y Z/z - rotate the solar system about the x,y, and z axes, respectively
+*		l - toggles the lights 
+*		MouseWheel in/out - zooms in and out 
+* 		Arrow Keys - pans left, right, up, and down
+* 
+* Additionally, we incorporated a mouse menu containing much (or all) of the 
+* functionality associated with the mouse and keyboard. This menu is accessed
+* via right-click. 
+* 
+* Using the keymap above the user can change attributes of the simulation, most
+* interestingly the texture mapping and shading diffrences and the animation 
+* speeds. 
+*
+* Known Bugs:
+*	- light(s) isn't set up right
+*	- pan, rotate seem to act a bit funky
+*	- smooth shading isn't working correctly probably something to do with normal
+*		vectors
+*	- planets not being drawn in front of the sun (and other objects) correctly
+*
+* Potential Improvements
+*
+*******************************************************************************/
 #include "solar.h"
 
+// Main - doesn't really do anything besides init things and get the ball rolling
 int main(int argc, char*argv[])
 {
+	// Init rand, create celestial objects, get random orbit positions
 	srand( time( NULL ) );
 	CreatePlanetArray();
 	InitPlanetOrbitPosition();
 
+	// let OpenGL/glut take over
 	glutInit( &argc, argv );
 	InitOpenGl();
 	glutMainLoop();
+	
+	// a useless statement 
+	return 0;
 }
 
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Inits OpenGL attributes
+*
+* Class the OpenGL init function (opengl.cpp) to initialize some OpenGL 
+* attributes.
+*
+* \params none
+* \return none
+*******************************************************************************/
 void InitOpenGl()
 {
 	init();
 }
 
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Creates the Planets array containing all the celestial objects
+*
+* Creates the Planets array by creating multiple Planet objects. The objects are
+* created with a scaled size w.r.t. the sun and other values found in the PA3 
+* writeup. After the planet objects are created they're added (mostly in order)
+* to the Planets array. Once filled, the Planets array is iterated and the 
+* scaled size of the planets is clipped and increased to better fit our display.
+*
+* \params none
+* \return none
+*******************************************************************************/
 void CreatePlanetArray()
 {
+	// create a color for each planet
 	Color color;
 	color.r = 1.0; color.g = 1.0; color.b = 0.0;
 	// scale the sun down a bit
 	Planet sun = Planet( 36000, 0, 0, 25, 20, "Sun", color );
 	float sunSize = sun.getRadius();
 
+	// create the 8 planets and Earth's moon with their various values
 	color.r = .5843; color.g = .502; color.b = .502;
 	Planet mercury = Planet( 2439, 58, 88, 1416, 2439.0/sunSize, "Mercury", color );
 	color.r = .8627; color.g = .8; color.b = .3765;
@@ -43,6 +122,7 @@ void CreatePlanetArray()
 	color.r = .8039; color.g = .7882; color.b = .7882;
 	Planet moon = Planet( 1738, 0.384, 27.3, 27.3, 1738.0/sunSize, "Moon", color );
 
+	// fill the Planets array
 	Planets[0] = sun;
 	Planets[1] = mercury;
 	Planets[2] = venus;
@@ -54,7 +134,7 @@ void CreatePlanetArray()
 	Planets[8] = neptune;
 	Planets[9] = moon;
 
-	// clip size
+	// clip the planets' scaled size and increase for our larger display
 	for( int i = 0; i < 10; i++ ) 
 	{
 		if( Planets[i].getScaledSize() > 1.0 )
@@ -62,15 +142,30 @@ void CreatePlanetArray()
 		Planets[i].setScaledSize( Planets[i].getScaledSize() * 10 );
 	}
 
+	// set the images associated with each planet
 	SetPlanetBitmaps();
 }
 
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Reads in BMPs which are to be mapped to all the celestial objects
+*
+* Using the LoadBmpFile(...) function provided by Dr. Wiess on the course website, 
+* we read in the BMP images stored in the img subdirectory of our project. After
+* reading the BMPs we set the Image associated with each Planet. The Image struct
+* stores the images row count, column count, and a pointer to the image's data.
+*
+* \params none
+* \return none
+*******************************************************************************/
 void SetPlanetBitmaps() 
 {
 	unsigned char* img;
 	int rows;
 	int cols;
-
+	
+	// read each BMP file associated with the objects and set the image on
+	// the planet object
 	LoadBmpFile( "img/sun.bmp", rows, cols, img );
 	Planets[0].setImage( img, rows, cols );
 	LoadBmpFile( "img/mercury.bmp", rows, cols, img );
@@ -93,12 +188,22 @@ void SetPlanetBitmaps()
 	Planets[9].setImage( img, rows, cols );
 }
 
-
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Start the planets at a random position in their orbit
+*
+* Sets the starting point if each planets orbit. A planet's orbit is restricted 
+* by 0 (the first day in its year) and the maximum number of days in its year. 
+*
+* \params none
+* \return none
+*******************************************************************************/
 void InitPlanetOrbitPosition()
 {
 	// planet max is it's 'year' max days per year
 	for( int i = 1; i < 9; i++ )
 	{
+		// generate and set a random orbit start location
 		Planet &p = Planets[i];
 		p.dayOfYear = rand() % (int)p.getYear();
 	}

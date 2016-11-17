@@ -1,9 +1,24 @@
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carrol
+* Date: 11/18/2016
+*
+* CSC - 533 Computer Graphics, Dr. John Weiss
+* Program 3 - Solar System Simulaton
+*
+* Description:
+*	The header file for opengl.cpp which contains all the OpenGL functionality
+* associated with the program. The headre file contains the function defintions, 
+* the external global variables from global.h, and the key values used in the 
+* mapping for keyboard functionality. 
+*
+*******************************************************************************/
 #ifndef GLOBAL_H
 #define GLOBAL_H
 #include "global.h"
 #endif
 
 // GLOBALS
+// external globals from global.h
 extern Planet Planets[10];
 extern int ScreenHeight;
 extern int ScreenWidth;
@@ -22,6 +37,7 @@ extern float RotateY;
 extern float RotateZ;
 extern bool LightsEnabled;
 
+// global int mappings  for key values
 const int Esc = 27;			// exit program
 const int s = 's'; 			// smooth shading
 const int f = 'f';			// flat shading

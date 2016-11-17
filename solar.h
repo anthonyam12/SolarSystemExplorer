@@ -1,3 +1,14 @@
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+*
+* CSC - 533 Computer Graphics, Dr. John Weiss
+* Program 3 - Solar System Simulation
+* 
+* Description:
+* 	The header file for solar.cpp. The header file contains function definitions
+* and declares the external global variables located in global.h
+*
+*******************************************************************************/
 #ifndef GLOBAL_H
 #define GLOBAL_H
 #include "global.h"
