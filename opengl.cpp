@@ -9,6 +9,9 @@
 *
 */
 
+// ext. functions
+bool LoadBmpFile( const char* filename, int &rows, int &cols, unsigned char* &imgPtr );
+
 /*******************************************************************************
  * 								OpenGL Callbacks 							   *
  ******************************************************************************/
@@ -46,6 +49,7 @@ void keyboard( unsigned char key, int x, int y )
 			break;
 		case t:
 			texture = TextureMap;
+			glEnable( GL_TEXTURE_2D );
 			break;
 		case Minus:
 			CamZ -= 5;
@@ -99,6 +103,13 @@ void keyboard( unsigned char key, int x, int y )
 			break;
 		case z:
 			RotateZ -= 1.0;
+			break;
+		case l:
+			LightsEnabled = !LightsEnabled;
+			if ( LightsEnabled )
+				glEnable( GL_LIGHTING );
+			else
+				glDisable( GL_LIGHTING );
 			break;
 		case Esc:
 			exit( 0 );
@@ -159,18 +170,22 @@ void display( void )
 	switch( texture )
 	{
 		case Wireframe:
+			glDisable( GL_TEXTURE_2D );
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 			break;
 		case Flat:
+			glDisable( GL_TEXTURE_2D );
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 			glShadeModel( GL_FLAT );
 			break;
 		case Smooth:
+			glDisable( GL_TEXTURE_2D );
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 			glShadeModel( GL_SMOOTH );
 			break;
 		case TextureMap:
-			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			glShadeModel( GL_SMOOTH );
 			break;
 	}
 
@@ -181,9 +196,10 @@ void display( void )
     glRotatef( RotateX, 0.0, 1.0, 0.0 );
 	glRotatef( RotateY, 1.0, 0.0, 0.0 );
 	glRotatef( RotateZ, 0.0, 0.0, 1.0 );
-
+	
 	for( int i = 8; i >= 1; i-- )
 	{
+		GLUquadric *quad = gluNewQuadric();
 		Planet &p = Planets[i];
 		// select multiplier to prevent ridiculous spinning
 		p.hourOfDay += p.animateIncrement*(IncrementMult > 0.25 ? IncrementMult : 0.5);
@@ -194,21 +210,33 @@ void display( void )
 		// Make closer objects on top of not closer objects		
 		glClear( GL_DEPTH_BUFFER_BIT );
 		// need to specify normals in here for smooth shading
-		Color c = p.getColor();
-		glColor3f( c.r, c.g, c.b ); 
+		if ( texture != TextureMap )
+		{
+			Color c = p.getColor();
+			glColor3f( c.r, c.g, c.b ); 
+		}
+		else 
+		{
+			unsigned char* img = p.getImage().ptr;
+			int nrows = p.getImage().rows, ncols = p.getImage().cols;
+			gluQuadricTexture (quad, GL_TRUE);
+			glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
+						  GL_RGB, GL_UNSIGNED_BYTE, img );
+			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+		}
 		glPushMatrix(); 
 			glRotatef( 360.0 * p.dayOfYear / p.getYear(), 0.0, 1.0, 0.0 );
 			glTranslatef( p.getDistance()/100 + (30*i), 0.0, 0.0 );
 			if( p.getName() == "Earth" )
 				glPushMatrix();
 			glRotatef( 360.0 * p.hourOfDay / p.getDay(), 0.0, 1.0, 0.0 );
-			gluSphere( gluNewQuadric(), p.getScaledSize(), 15, 15 );	
+			gluSphere( quad, p.getScaledSize(), 15, 15 );	
 			// draw the moon if earth
 			if( p.getName() == "Earth" )
 			{
 				glPopMatrix();
 	    		glRotatef( 360.0 * 12.0 * p.dayOfYear / 365.0, 0.0, 1.0, 0.0 );
-		   	 	glTranslatef( p.getScaledSize() + 0.7, 0.0, 0.0 );
+		   	 	glTranslatef( p.getScaledSize() + 1.1, 0.0, 0.0 );
 				Planet moon = Planets[9];
 				Color mc = moon.getColor();
 				glColor3f( mc.r, mc.g, mc.b );
@@ -219,9 +247,22 @@ void display( void )
 
     // Draw the sun	-- as a yellow, wireframe sphere
 	glClear( GL_DEPTH_BUFFER_BIT );
-    glColor3f( 1.0, 1.0, 0.0 );
-    gluSphere( gluNewQuadric(), 20, 20, 20 );
-
+	GLUquadric *quad = gluNewQuadric();
+	if( texture != TextureMap )
+	{
+    	glColor3f( 1.0, 1.0, 0.0 );
+	}
+	else 
+	{
+		Planet p = Planets[0];
+		unsigned char* img = p.getImage().ptr;
+		int nrows = p.getImage().rows, ncols = p.getImage().cols;
+		gluQuadricTexture ( quad, GL_TRUE );
+		glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
+					  GL_RGB, GL_UNSIGNED_BYTE, img );
+		glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+	}
+    gluSphere( quad, 20, 20, 20 );
 	glutSwapBuffers();
 
 	if ( !SingleStep && !Paused )
@@ -241,7 +282,7 @@ void reshape( int w, int h )
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();	
-	gluPerspective( 60, aspectRatio, -10, 10 ); 
+	gluPerspective( 60, aspectRatio, -100, 1 ); 
     glMatrixMode( GL_MODELVIEW );
 }
 
@@ -270,14 +311,41 @@ void init()
 	glEnable( GL_NORMALIZE );
 	glEnable( GL_DEPTH_TEST );
     glEnable( GL_TEXTURE_2D );
+
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 
 	SetupTextureMapping();
+	CreateLights();
 
 	texture = Wireframe;
+}
+
+void CreateLights()
+{
+	// enable lighting	
+	glEnable( GL_LIGHTING );
+	
+	// setup light properties for colors and materials
+	glEnable( GL_COLOR_MATERIAL );
+	glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE );
+
+	// ambient light - weighted more towards yellow because of sun
+	GLfloat lv[4] = { 0.2, 0.2, 0.2, 1.0 };
+	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lv );
+
+	// light for the sun -- I don't think this is position correctly
+	glEnable( GL_LIGHT0 );
+	GLfloat la[4] = { 0.0, 0.0, 0.0, 1.0 }; // ambient light
+	GLfloat ld[4] = { 1.0, 1.0, 0.5, 1.0 }; // diffuse light
+	GLfloat ls[4] = { 0.0, 0.0, 0.0, 1.0 }; // specular light
+	GLfloat lp[4] = { 0.0, 0.0, 0.0, 1.0 }; // light position
+	glLightfv( GL_LIGHT0, GL_AMBIENT, la );
+	glLightfv( GL_LIGHT0, GL_DIFFUSE, ld );
+	glLightfv( GL_LIGHT0, GL_SPECULAR, ls );
+	glLightfv( GL_LIGHT0, GL_POSITION, lp );
 }
 
 void SetupTextureMapping()

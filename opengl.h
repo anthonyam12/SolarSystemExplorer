@@ -20,6 +20,7 @@ extern bool NonMove;
 extern float RotateX;
 extern float RotateY;
 extern float RotateZ;
+extern bool LightsEnabled;
 
 const int Esc = 27;			// exit program
 const int s = 's'; 			// smooth shading
@@ -38,6 +39,7 @@ const int Y = 'Y';			// rotate up in Y direction
 const int yy = 'y';			// rotate down in Y direction
 const int Z = 'Z';			// rotate up/right in the Z direction
 const int z = 'z';			// rotate left/down in the Z direction
+const int l = 'l';			// toggles lights on and off
 
 // FUNCTIONS
 // OpenGL Callbacks
@@ -50,3 +52,4 @@ void mouseclick( int button, int state, int x, int y );
 // Misc.
 void init();
 void SetupTextureMapping();
+void CreateLights();

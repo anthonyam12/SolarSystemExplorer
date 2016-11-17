@@ -21,7 +21,7 @@ void CreatePlanetArray()
 	Color color;
 	color.r = 1.0; color.g = 1.0; color.b = 0.0;
 	// scale the sun down a bit
-	Planet sun = Planet( 36000, 0, 0, 25, 1, "Sun", color );
+	Planet sun = Planet( 36000, 0, 0, 25, 20, "Sun", color );
 	float sunSize = sun.getRadius();
 
 	color.r = .5843; color.g = .502; color.b = .502;
