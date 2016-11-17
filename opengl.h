@@ -51,5 +51,4 @@ void mouseclick( int button, int state, int x, int y );
 
 // Misc.
 void init();
-void SetupTextureMapping();
 void CreateLights();

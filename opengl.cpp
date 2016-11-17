@@ -316,8 +316,7 @@ void init()
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-
-	SetupTextureMapping();
+;
 	CreateLights();
 
 	texture = Wireframe;
@@ -346,16 +345,4 @@ void CreateLights()
 	glLightfv( GL_LIGHT0, GL_DIFFUSE, ld );
 	glLightfv( GL_LIGHT0, GL_SPECULAR, ls );
 	glLightfv( GL_LIGHT0, GL_POSITION, lp );
-}
-
-void SetupTextureMapping()
-{
-	glGenTextures( 9, &textureNames[0] );
-	for( int i = 0; i <= 9; i++ )
-	{
-		glBindTexture( GL_TEXTURE_2D, textureNames[i] );
-		Image img = Planets[i].getImage();
-		gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, img.cols, img.rows,
-						  GL_RGB, GL_UNSIGNED_BYTE, img.ptr );
-	}
 }
