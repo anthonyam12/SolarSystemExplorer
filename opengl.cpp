@@ -271,14 +271,9 @@ void display( void )
     glRotatef( RotateX, 0.0, 1.0, 0.0 );
 	glRotatef( RotateY, 1.0, 0.0, 0.0 );
 	glRotatef( RotateZ, 0.0, 0.0, 1.0 );
-	
-	Planets[0].DrawSun();
-	for (int i = 1; i < 9; i++)
-	{
-		Planet &p = Planets[i];
-		p.Draw( i );
-	}
 
+	
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );	
 	glColor3f( 0.0, 1.0, 0.0 );
 	for ( int i = 1; i < 9; i++ )
 	{
@@ -291,6 +286,16 @@ void display( void )
 			glRotatef( 90.0, 1, 0, 0 );
 			gluCylinder( orbit,  baseDistance, baseDistance+.001, .0001, 80, 80 );	
 		glPopMatrix();
+	}
+	if ( texture != Wireframe )
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+
+
+	Planets[0].DrawSun();
+	for (int i = 1; i < 9; i++)
+	{
+		Planet &p = Planets[i];
+		p.Draw( i );
 	}
 
 	glFlush();
