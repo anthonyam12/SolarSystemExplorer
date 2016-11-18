@@ -1,14 +1,5 @@
 #include "opengl.h"
 
-/***
-*
-* NOTE!!!!!!!!!!!!!!! IF this file becomes > 500 lines, move the input handling
-* to another class/cpp file. Since most things modified are global this should
-* be no problem. We would just cut and paste the openGL callbacks to another 
-* file/class and set the functions differently in init().
-*
-*/
-
 // ext. functions
 bool LoadBmpFile( const char* filename, int &rows, int &cols, unsigned char* &imgPtr );
 
@@ -273,7 +264,8 @@ void display( void )
 	glRotatef( RotateZ, 0.0, 0.0, 1.0 );
 
 	
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );	
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	glDisable( GL_TEXTURE_2D );
 	glColor3f( 0.0, 1.0, 0.0 );
 	for ( int i = 1; i < 9; i++ )
 	{
@@ -289,7 +281,8 @@ void display( void )
 	}
 	if ( texture != Wireframe )
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
+	if ( texture == TextureMap )
+		glEnable( GL_TEXTURE_2D );
 
 	Planets[0].DrawSun();
 	for (int i = 1; i < 9; i++)

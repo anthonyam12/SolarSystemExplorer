@@ -102,9 +102,14 @@ void Planet::Draw( int i )
 	glRotatef( 360.0 * hourOfDay / getDay(), 0.0, 1.0, 0.0 );
 	gluSphere( quad, getScaledSize(), 15, 15 );
 
+	// draw name
+	glDisable( GL_TEXTURE_2D );
 	glColor3f( 0.0, 1.0, 0.0 );
 	glRasterPos3f( 0.0, getScaledSize()*1.2, 0.0 );
 	glutBitmapString( GLUT_BITMAP_9_BY_15, (const unsigned char*)name.c_str() );
+	if( texture == TextureMap )
+		glEnable( GL_TEXTURE_2D );
+	
 	// draw the moon if earth
 	if( getName() == "Earth" )
 	{
@@ -129,9 +134,12 @@ void Planet::Draw( int i )
 			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 		}
  		gluSphere( moonq, moon.getScaledSize(), 10, 10 );
+		glDisable( GL_TEXTURE_2D );
 		glColor3f( 0.0, 1.0, 0.0 );
 		glRasterPos3f( 0.0, moon.getScaledSize()*1.2, 0.0 );
 		glutBitmapString( GLUT_BITMAP_9_BY_15, (const unsigned char*)moon.getName().c_str() );
+		if ( texture == TextureMap )
+			glEnable( GL_TEXTURE_2D );
 	}
 	glPopMatrix();
 }
