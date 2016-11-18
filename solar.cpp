@@ -135,9 +135,9 @@ void CreatePlanetArray()
 	Planets[9] = moon;
 
 	// clip the planets' scaled size and increase for our larger display
-	for( int i = 0; i < 10; i++ ) 
+	for( int i = 1; i < 10; i++ ) 
 	{
-		if( Planets[i].getScaledSize() > 1.0 )
+		if( Planets[i].getScaledSize() > 1.0)
 			Planets[i].setScaledSize( 1.0 );
 		Planets[i].setScaledSize( Planets[i].getScaledSize() * 10 );
 	}

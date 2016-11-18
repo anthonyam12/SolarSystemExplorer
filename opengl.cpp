@@ -237,8 +237,8 @@ void special( int key, int x, int y )
 *******************************************************************************/
 void display( void )
 {
-	glLoadIdentity();
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glLoadIdentity();
 	
 	// sets the OpenGL attributes we need set depending on
 	// how we want to texture our objects
@@ -272,82 +272,8 @@ void display( void )
 	glRotatef( RotateY, 1.0, 0.0, 0.0 );
 	glRotatef( RotateZ, 0.0, 0.0, 1.0 );
 	
-	// for each celestial object that isn't the sun or moon
-	// drawn in reverse order so further objects are behind closer ones
-	for( int i = 8; i >= 1; i-- )
-	{
-		GLUquadric *quad = gluNewQuadric();
-		Planet &p = Planets[i];
-
-		// select multiplier to prevent ridiculous spinning
-		p.hourOfDay += p.animateIncrement*(IncrementMult > 0.25 ? IncrementMult : 0.5);
-		p.dayOfYear = p.dayOfYear + ((p.animateIncrement*IncrementMult) / p.getDay());
-		p.hourOfDay = p.hourOfDay - ( (int)( p.hourOfDay / p.getDay() ) ) * p.getDay();
-		p.dayOfYear = p.dayOfYear - ( (int)( p.dayOfYear / p.getYear() ) ) * p.getYear();
-
-		// Make closer objects on top of further objects		
-		glClear( GL_DEPTH_BUFFER_BIT );
-
-		// need to specify normals in here for smooth shading
-		if ( texture != TextureMap )
-		{
-			Color c = p.getColor();
-			glColor3f( c.r, c.g, c.b ); 
-		}
-		else 
-		{
-			// map the BMPs to the planets if in TextureMap mode
-			unsigned char* img = p.getImage().ptr;
-			int nrows = p.getImage().rows, ncols = p.getImage().cols;
-			gluQuadricTexture (quad, GL_TRUE);
-			glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
-						  GL_RGB, GL_UNSIGNED_BYTE, img );
-			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-		}
-
-		// preserve the state so these operations only affect the current planet
-		glPushMatrix(); 
-			// rotate planet around the sun
-			glRotatef( 360.0 * p.dayOfYear / p.getYear(), 0.0, 1.0, 0.0 );
-			// move a distance from the sun
-			glTranslatef( p.getDistance()/100 + (30*i), 0.0, 0.0 );
-			// if we're the earth preserve the state again as to not affect the moon
-			if( p.getName() == "Earth" )
-				glPushMatrix();
-			// rotation on the planet's axis
-			glRotatef( 360.0 * p.hourOfDay / p.getDay(), 0.0, 1.0, 0.0 );
-			gluSphere( quad, p.getScaledSize(), 15, 15 );	
-			// draw the moon if earth
-			if( p.getName() == "Earth" )
-			{
-				glPopMatrix();
-				GLUquadric *moonq = gluNewQuadric();
-	    		glRotatef( 360.0 * 12.0 * p.dayOfYear / 365.0, 0.0, 1.0, 0.0 );
-		   	 	glTranslatef( p.getScaledSize() + 1.1, 0.0, 0.0 );
-				Planet moon = Planets[9];
-				// handle moons texture
-				if( texture != TextureMap )
-				{
-					Color mc = moon.getColor();
-					glColor3f( mc.r, mc.g, mc.b );
-				}
-				else 
-				{	
-					unsigned char* img = moon.getImage().ptr;
-					int nrows = moon.getImage().rows, ncols = moon.getImage().cols;
-					gluQuadricTexture (moonq, GL_TRUE);
-					glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
-								  GL_RGB, GL_UNSIGNED_BYTE, img );
-					glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-				}
-    			gluSphere( moonq, moon.getScaledSize(), 10, 10 );
-			}
-		// restore original state
-		glPopMatrix();	
-	}
-
     // Draw the sun	depending on current texture mode
-	glClear( GL_DEPTH_BUFFER_BIT );
+	//glClear( GL_DEPTH_BUFFER_BIT );
 	GLUquadric *quad = gluNewQuadric();
 	if( texture != TextureMap )
 	{
@@ -364,7 +290,85 @@ void display( void )
 		glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	}
     gluSphere( quad, 20, 20, 20 );
+	if( LightsEnabled )
+	{
+		// light for the sun -- I don't think this is position correctly
+		glEnable( GL_LIGHT0 );
+		GLfloat la[4] = { .5, .5, .5, 1.0 }; // ambient light
+		GLfloat ld[4] = { 1.0, 1.0, 0.5, 1.0 }; // diffuse light
+		GLfloat ls[4] = { 1.0, 1.0, 0.5, 1.0 }; // specular light
+		GLfloat lp[4] = { 1.0, 1.0, 0.0, 1.0 }; // light position
+	
+		// create sun light source
+		glLightfv( GL_LIGHT0, GL_AMBIENT, la );
+		glLightfv( GL_LIGHT0, GL_DIFFUSE, ld );
+		glLightfv( GL_LIGHT0, GL_SPECULAR, ls );
+		glLightfv( GL_LIGHT0, GL_POSITION, lp );
+	}
+	
+	for (int i = 1; i < 9; i++)
+	{
+		GLUquadric *quad = gluNewQuadric();
+		Planet &p = Planets[i];
 
+		// select multiplier to prevent ridiculous spinning
+		p.hourOfDay += p.animateIncrement*(IncrementMult > 0.25 ? IncrementMult : 0.5);
+		p.dayOfYear = p.dayOfYear + ((p.animateIncrement*IncrementMult) / p.getDay());
+		p.hourOfDay = p.hourOfDay - ( (int)( p.hourOfDay / p.getDay() ) ) * p.getDay();
+		p.dayOfYear = p.dayOfYear - ( (int)( p.dayOfYear / p.getYear() ) ) * p.getYear();
+	
+		glPushMatrix();
+		if ( texture != TextureMap )
+		{
+			Color c = p.getColor();
+			glColor3f( c.r, c.g, c.b ); 
+		}
+		else 
+		{
+			// map the BMPs to the planets if in TextureMap mode
+			unsigned char* img = p.getImage().ptr;
+			int nrows = p.getImage().rows, ncols = p.getImage().cols;
+			gluQuadricTexture (quad, GL_TRUE);
+			glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
+						  GL_RGB, GL_UNSIGNED_BYTE, img );
+			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+		}
+		glRotatef( 360.0 * p.dayOfYear / p.getYear(), 0.0, 1.0, 0.0 );
+		glTranslatef( (30.0*i)+(p.getDistance()/100.0), 0.0, 0.0 );		
+		if( p.getName() == "Earth" )
+			glPushMatrix();
+		// rotation on the planet's axis
+		glRotatef( 360.0 * p.hourOfDay / p.getDay(), 0.0, 1.0, 0.0 );
+		gluSphere( quad, p.getScaledSize(), 15, 15 );
+		// draw the moon if earth
+		if( p.getName() == "Earth" )
+		{
+			glPopMatrix();
+			GLUquadric *moonq = gluNewQuadric();
+    		glRotatef( 360.0 * 12.0 * p.dayOfYear / 365.0, 0.0, 1.0, 0.0 );
+	   	 	glTranslatef( p.getScaledSize() + 1.1, 0.0, 0.0 );
+			Planet moon = Planets[9];
+			// handle moons texture
+			if( texture != TextureMap )
+			{
+				Color mc = moon.getColor();
+				glColor3f( mc.r, mc.g, mc.b );
+			}
+			else 
+			{	
+				unsigned char* img = moon.getImage().ptr;
+				int nrows = moon.getImage().rows, ncols = moon.getImage().cols;
+				gluQuadricTexture (moonq, GL_TRUE);
+				glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
+							  GL_RGB, GL_UNSIGNED_BYTE, img );
+				glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+			}
+   			gluSphere( moonq, moon.getScaledSize(), 10, 10 );
+		}
+		glPopMatrix();
+	}
+
+	glFlush();
 	glutSwapBuffers();
 	
 	// if we're not paused or in single step mode redraw display
@@ -394,7 +398,7 @@ void reshape( int w, int h )
 	// adjust projection based on new screen size
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();	
-	gluPerspective( 60, aspectRatio, -100, 1 ); 
+	gluPerspective( 60, aspectRatio, 1, 1000 ); 
 	
     glMatrixMode( GL_MODELVIEW );
 }
@@ -432,7 +436,6 @@ void init()
 	glutKeyboardFunc( keyboard );
 	
 	// enable texture tpye attributes
-	glEnable( GL_NORMALIZE );
 	glEnable( GL_DEPTH_TEST );
     glEnable( GL_TEXTURE_2D );
 
@@ -473,17 +476,4 @@ void CreateLights()
 	// ambient light - weighted more towards yellow because of sun
 	GLfloat lv[4] = { 0.2, 0.2, 0.2, 1.0 };
 	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lv );
-
-	// light for the sun -- I don't think this is position correctly
-	glEnable( GL_LIGHT0 );
-	GLfloat la[4] = { 0.0, 0.0, 0.0, 1.0 }; // ambient light
-	GLfloat ld[4] = { 1.0, 1.0, 0.5, 1.0 }; // diffuse light
-	GLfloat ls[4] = { 0.0, 0.0, 0.0, 1.0 }; // specular light
-	GLfloat lp[4] = { 0.0, 0.0, 0.0, 1.0 }; // light position
-
-	// create sun light source
-	glLightfv( GL_LIGHT0, GL_AMBIENT, la );
-	glLightfv( GL_LIGHT0, GL_DIFFUSE, ld );
-	glLightfv( GL_LIGHT0, GL_SPECULAR, ls );
-	glLightfv( GL_LIGHT0, GL_POSITION, lp );
 }

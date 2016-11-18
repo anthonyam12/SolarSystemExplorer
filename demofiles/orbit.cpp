@@ -31,11 +31,9 @@
 */
 
 // JMW: Minor modifications for CSC433/533 Computer Graphics, Fall 2016.
-#include <iostream>
+
 #include <cstdlib>
 #include <GL/freeglut.h>
-
-using namespace std;
 
 // function prototypes
 void OpenGLInit( void );
@@ -138,12 +136,12 @@ void Animate( void )
         HourOfDay = HourOfDay - ( ( int ) ( HourOfDay / 24 ) ) * 24;
         DayOfYear = DayOfYear - ( ( int ) ( DayOfYear / 365 ) ) * 365;
     }
-	cout << AnimateIncrement << endl;
+
     // Clear the current matrix (Modelview)
     glLoadIdentity();
 
     // Back off eight units to be able to view from the origin.
-    //glTranslatef ( 0.0, 0.0, -8.0 );
+    glTranslatef ( 0.0, 0.0, -8.0 );
 
     // Rotate the plane of the elliptic
     // (rotate the model's plane about the x axis by fifteen degrees)
@@ -151,9 +149,8 @@ void Animate( void )
 
     // Draw the sun	-- as a yellow, wireframe sphere
     glColor3f( 1.0, 1.0, 0.0 );
-    glutWireSphere( 1.0, 15, 15 );
+    gluSphere( gluNewQuadric(), 1.0, 15, 15 );
 
-	glPushMatrix();
     // Draw the Earth
     // First position it around the sun. Use DayOfYear to determine its position.
     glRotatef( 360.0 * DayOfYear / 365.0, 0.0, 1.0, 0.0 );
@@ -163,20 +160,14 @@ void Animate( void )
     glRotatef( 360.0 * HourOfDay / 24.0, 0.0, 1.0, 0.0 );
     // Third, draw the earth as a wireframe sphere.
     glColor3f( 0.2, 0.2, 1.0 );
-    glutWireSphere( 0.4, 10, 10 );
+    gluSphere( gluNewQuadric(), 0.4, 10, 10 );
     glPopMatrix();						// Restore matrix state
 
     // Draw the moon. Use DayOfYear to control its rotation around the earth
     glRotatef( 360.0 * 12.0 * DayOfYear / 365.0, 0.0, 1.0, 0.0 );
     glTranslatef( 0.7, 0.0, 0.0 );
     glColor3f( 0.3, 0.7, 0.3 );
-    glutWireSphere( 0.1, 5, 5 );
-	glPopMatrix();
-
-		
-    glTranslatef( 7, 0.0, 0.0 );
-    glColor3f( 0.3, 0.7, 1.0 );
-    glutWireSphere( 1, 50, 50 );
+    gluSphere( gluNewQuadric(), 0.1, 5, 5 );
 
     // Flush the pipeline, and swap the buffers
     glFlush();
@@ -211,10 +202,8 @@ void ResizeWindow( int w, int h )
     // Set up the projection view matrix (not very well!)
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-	 if ( w <= h )
-        glOrtho( -18.0, 18.0, -18.0 * aspectRatio, 18.0 * aspectRatio, -10.0, 10.0 );
-    else
-        glOrtho( -18.0 * aspectRatio, 18.0 * aspectRatio, -18.0, 18.0, -10.0, 10.0 );
+    gluPerspective( 60.0, aspectRatio, 1.0, 30.0 );
+	//glOrtho( 0, 0, 1000, 1000, 1, 30 );
     // Select the Modelview matrix
     glMatrixMode( GL_MODELVIEW );
 }
