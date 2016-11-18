@@ -47,7 +47,7 @@ void keyboard( unsigned char key, int x, int y )
 {
 	// s - single step
 	// f - flat/smooth shading toggle
-	// w - wireframe
+	// w/p - wireframe
 	// t - texture mapping
 	// r - pause/resume
 	// A/a - speed up/down animation
@@ -64,6 +64,7 @@ void keyboard( unsigned char key, int x, int y )
 			cba.ToggleShading();
 			break;
 		case w:
+		case p:
 			cba.ToggleWireframe();
 			break;
 		case t:
@@ -115,6 +116,8 @@ void keyboard( unsigned char key, int x, int y )
 	// funky logic to be able to change the simulation attributes
 	// without taking a 'step' 
 	if ( ( SingleStep && key != Space ) || Paused )
+		// need this to be 0 to prevent the simulation from moving when paused
+		// or in single step mode if we press any button besides space. 
 		IncrementMult = 0.0;
 	else if ( SingleStep )
 		IncrementMult = PreviousMult;

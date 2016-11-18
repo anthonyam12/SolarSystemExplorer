@@ -17,7 +17,7 @@ UpArrow/DownArrow	- rotate up/down
 RightArrow/LeftArrow	- pan right/left
 X/x/Y/y/Z/z		- pan in X/Y/Z directions
 N/n			- increase/decrease resolution of spheres
-p			- toggle wireframe/polygon rendering
+p/w			- toggle wireframe/polygon rendering
 f			- toggle flat/smooth shading of polygons
 t			- toggle texture mapping
 A/a			- speed up/slow down animation

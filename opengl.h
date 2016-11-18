@@ -40,6 +40,7 @@ extern CallbackAction cba;
 const int Esc = 27;			// exit program
 const int s = 's'; 			// smooth shading
 const int f = 'f';			// flat shading
+const int p = 'p';			// wireframe
 const int w = 'w';			// wireframe
 const int t = 't';			// texture mapping
 const int r = 'r';			// resume/stop simulation
