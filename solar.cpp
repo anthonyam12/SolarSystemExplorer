@@ -27,6 +27,8 @@
 *		l - toggles the lights 
 *		MouseWheel in/out - zooms in and out 
 * 		Arrow Keys - pans left, right, up, and down
+* 		Mouse Left Click and drag - rotate around the x and y axes
+* 		Mouse Right Click - pop up menues
 * 
 * Additionally, we incorporated a mouse menu containing much (or all) of the 
 * functionality associated with the mouse and keyboard. This menu is accessed
@@ -37,11 +39,8 @@
 * speeds. 
 *
 * Known Bugs:
-*	- light(s) isn't set up right
 *	- pan, rotate seem to act a bit funky
-*	- smooth shading isn't working correctly probably something to do with normal
-*		vectors
-*	- planets not being drawn in front of the sun (and other objects) correctly
+*	- rotate x curves
 *
 * Potential Improvements
 *
@@ -207,9 +206,4 @@ void InitPlanetOrbitPosition()
 		Planet &p = Planets[i];
 		p.dayOfYear = rand() % (int)p.getYear();
 	}
-}
-
-void SetPlanetOrbitPoints() 
-{
-	
 }

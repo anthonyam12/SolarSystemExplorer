@@ -123,6 +123,7 @@ void keyboard( unsigned char key, int x, int y )
 * Handles input from the mouse's buttons. Interactions are mapped as
 *		mouse wheel out/down - zoom out 
 *		mouse wheel up/in - zoom in 
+*		mouse left click - rotate around x and y
 *
 * \params 
 *		button - the mouse button pressed
@@ -139,6 +140,10 @@ void mouseclick( int button, int state, int x, int y )
 		cba.Zoom( true );
 	if( button == 4 )
 		cba.Zoom( false );
+	if( button == GLUT_LEFT_BUTTON )
+	{ 
+		StartX = x; StartY = y; 
+	}
 	glutPostRedisplay();
 }
 
@@ -231,7 +236,7 @@ void display( void )
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glLoadIdentity();
-	
+		
 	// sets the OpenGL attributes we need set depending on
 	// how we want to texture our objects
 	switch( texture )
@@ -326,6 +331,34 @@ void reshape( int w, int h )
     glMatrixMode( GL_MODELVIEW );
 }
 
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Rotates the scene based on mouse movement
+*
+* A startx and starty postion are created when the user clicks the left
+* mouse button. This method tracks that motion and rotates the solar system scene
+* according the the mouse movement.
+*
+* \params x - current mouse x
+* 		  y - current mouse y
+* \return none
+*******************************************************************************/
+void mousedrag( int x, int y )
+{
+	float change = 1.0;
+	if( x < StartX )
+		RotateX += change;
+	else if ( x > StartX )
+		RotateX -= change;
+
+	if( y < StartY )
+		RotateY -= change;
+	else if ( y > StartY )
+		RotateY += change;
+
+	StartX = x;
+	StartY = y;
+}
 
 /*******************************************************************************
  * 									Misc.									   *
@@ -359,6 +392,7 @@ void init()
 	glutReshapeFunc( reshape );
 	glutKeyboardFunc( keyboard );
 	glutMouseFunc( mouseclick );
+	glutMotionFunc( mousedrag );
 	
 	// enable texture tpye attributes
 	glEnable( GL_DEPTH_TEST );

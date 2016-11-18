@@ -35,6 +35,8 @@ extern float RotateY;
 extern float RotateZ;
 extern bool LightsEnabled;
 extern CallbackAction cba;
+extern int StartX;
+extern int StartY;
 
 // global int mappings  for key values
 const int Esc = 27;			// exit program
@@ -64,6 +66,7 @@ void special( int key, int x, int y );
 void display( void );
 void reshape( int w, int h );
 void mouseclick( int button, int state, int x, int y );
+void mousedrag( int x, int y );
 void animationMenu( int item );
 void rotateMenu( int item );
 void panMenu( int item );

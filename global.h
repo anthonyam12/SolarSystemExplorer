@@ -130,6 +130,8 @@ float RotateX = 0.0;			// initial camera x rotation
 float RotateY = 15.0;			// initial camera y rotation
 float RotateZ = 0.0;			// initial camera z rotation
 bool LightsEnabled = true;		// used to determine if our lights are toggled on or off
+float StartX = 0;				// used to rotate via mouse movement
+float StartY = 0;				// used to rotate via mouse movement
 
 Planet Planets[10];				// stores the celestial objects
 Texture texture;				// the current texture state of the simulation
