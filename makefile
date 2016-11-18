@@ -36,7 +36,10 @@ planet: planet.o
 bmpRead.o:
 	$(LINK) -o $@ $^ -c $(GL_LIBS) bmpRead.cpp
 
-solar: planet.o opengl.o bmpRead.o
+callbackaction.o:
+	$(LINK) -o $@ $^ -c $(GL_LIBS) callbackaction.cpp
+
+solar: planet.o opengl.o bmpRead.o callbackaction.o
 	$(LINK) -o $@ $^ solar.cpp $(GL_LIBS)
 
 # generic C and C++ targets for OpenGL programs consisting of only one file

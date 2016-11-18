@@ -47,6 +47,8 @@ class Planet
 	public:
 		Planet( float r, float d, float y, float da, float size, string n, Color c );
 		Planet();
+		void Draw( int index );
+		void DrawSun();
 
 		// Getters
 		float getRadius();
@@ -83,6 +85,27 @@ class Planet
 		Image img;
 };
 
+// a class to handle opengl callback actions
+class CallbackAction
+{
+	public:
+		void ToggleSingleStep();
+		void TogglePause();
+		void ToggleShading();
+		void ToggleWireframe();
+		void ToggleTextureMapping();
+		void ToggleLights();
+		void AnimationSpeed( bool increase );
+		void Zoom( bool zoomIn );
+		void Rotate( int axis, bool up );		
+		void Pan( int direction );
+
+		void PanClick( int item );
+		void ObjectViewClick( int item );
+		void RotateClick( int item );
+		void AnimationClick( int item ); 
+};
+
 // Used to determine and set the current Texture state. The celestial 
 // objects can be represented as wireframe spheres, flat/smooth shaded
 // spheres, or spheres with BMP images textue mapped to them.
@@ -110,4 +133,5 @@ bool LightsEnabled = true;		// used to determine if our lights are toggled on or
 
 Planet Planets[10];				// stores the celestial objects
 Texture texture;				// the current texture state of the simulation
+CallbackAction cba;
 #endif 

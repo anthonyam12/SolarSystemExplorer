@@ -23,7 +23,6 @@ extern Planet Planets[10];
 extern int ScreenHeight;
 extern int ScreenWidth;
 extern Texture texture;
-extern GLuint textureNames[10];
 extern float CamZ;
 extern float CamY;
 extern float CamX;
@@ -31,11 +30,11 @@ extern float IncrementMult;
 extern float PreviousMult;
 extern bool SingleStep;
 extern bool Paused;
-extern bool NonMove;
 extern float RotateX;
 extern float RotateY;
 extern float RotateZ;
 extern bool LightsEnabled;
+extern CallbackAction cba;
 
 // global int mappings  for key values
 const int Esc = 27;			// exit program
@@ -64,7 +63,13 @@ void special( int key, int x, int y );
 void display( void );
 void reshape( int w, int h );
 void mouseclick( int button, int state, int x, int y );
+void animationMenu( int item );
+void rotateMenu( int item );
+void panMenu( int item );
+void objectViewMenu( int item );
+void mainmenu( int item );
 
 // Misc.
 void init();
 void CreateLights();
+void CreateMenus();

@@ -58,92 +58,60 @@ void keyboard( unsigned char key, int x, int y )
 	switch( key ) 
 	{
 		case s:
-			if ( !Paused )
-			{
-				SingleStep = !SingleStep;
-				if ( SingleStep )
-					PreviousMult = IncrementMult;
-				else
-					IncrementMult = PreviousMult;
-			}
+			cba.ToggleSingleStep();
 			break;
 		case f:
-			if ( texture == Flat )
-				texture = Smooth;
-			else 
-				texture = Flat;
+			cba.ToggleShading();
 			break;
 		case w:
-			texture = Wireframe;
+			cba.ToggleWireframe();
 			break;
 		case t:
-			texture = TextureMap;
-			glEnable( GL_TEXTURE_2D );
+			cba.ToggleTextureMapping();
 			break;
 		case Minus:
-			CamZ -= 5;
+			cba.Zoom( false );
 			break;
 		case Plus:
-			CamZ += 5;
+			cba.Zoom( true );
 			break;
 		case r:
-			if ( !SingleStep )
-			{
-				Paused = !Paused;
-				if ( Paused )
-				{
-					PreviousMult = IncrementMult;
-					IncrementMult = 0.0;
-				}
-				else
-					IncrementMult = PreviousMult;
-			}
+			cba.TogglePause();
 			break;
 		case Space:
 			break;
 		case A:
-			IncrementMult = IncrementMult == 0 ? .25 : 
-							IncrementMult * 2;
-			if ( Paused || SingleStep )
-			{
-				PreviousMult = PreviousMult == 0 ? .25 : 
-							   PreviousMult * 2;
-			}
+			cba.AnimationSpeed( true );
 			break;
 		case a:
-			IncrementMult /= 2.0;
-			if( Paused || SingleStep )
-				PreviousMult /= 2;
+			cba.AnimationSpeed( false );
 			break;
 		case X:
-			RotateX -= 1.0;
+			cba.Rotate( 1, true );
 			break;
 		case xx:
-			RotateX += 1.0;
+			cba.Rotate( 1, false );
 			break;
 		case Y:
-			RotateY += 1.0;
+			cba.Rotate( 2, true );
 			break;
 		case yy:
-			RotateY -= 1.0;
+			cba.Rotate( 2, false );
 			break;
 		case Z:
-			RotateZ += 1.0;
+			cba.Rotate( 3, true );
 			break;
 		case z:
-			RotateZ -= 1.0;
+			cba.Rotate( 3, false );
 			break;
 		case l:
-			LightsEnabled = !LightsEnabled;
-			if ( LightsEnabled )
-				glEnable( GL_LIGHTING );
-			else
-				glDisable( GL_LIGHTING );
+			cba.ToggleLights();
 			break;
 		case Esc:
 			exit( 0 );
 			break;
 	}
+
 	// funky logic to be able to change the simulation attributes
 	// without taking a 'step' 
 	if ( ( SingleStep && key != Space ) || Paused )
@@ -174,10 +142,9 @@ void mouseclick( int button, int state, int x, int y )
 	// mouse wheel in - zoom in
 	// mouse wheel out - zoom out
 	if( button == 3 ) // mouse wheel 'in', zoom in
-		CamZ += 5.0;
+		cba.Zoom( true );
 	if( button == 4 )
-		CamZ -= 5.0;
-
+		cba.Zoom( false );
 	glutPostRedisplay();
 }
 
@@ -200,24 +167,55 @@ void special( int key, int x, int y )
 	// down - pan down (-y)
 	// left - pan left
 	// right - pan right
-	switch( key )
-	{
-		case GLUT_KEY_UP:
-			CamY -= 2.0;
-			break;
-		case GLUT_KEY_DOWN:
-			CamY += 2.0;
-			break;
-		case GLUT_KEY_RIGHT:
-			CamX -= 2.0;
-			break;
-		case GLUT_KEY_LEFT:
-			CamX += 2.0;
-			break;
-	}
+	cba.Pan( key );
 	glutPostRedisplay();
 }
 
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carrol
+* /brief Callback handlers for the mouse menus
+*
+* These five methods (mainmenu, animationMenu, rotateMenu, panMenu, and 
+* objectViewMenu) are the callbacks for the OpenGL pop-up menu. Each method makces
+* a call into the CallbackAction class where we actually determine which actions
+* to perform and performs them. The exception being the mainmenu handler which 
+* can only perform one action (exiting).
+*
+* params
+*		item - the menu item clicked
+* returns none
+*******************************************************************************/
+void animationMenu( int item )
+{
+	cba.AnimationClick( item );
+	if ( item == 3 && SingleStep )
+		IncrementMult = PreviousMult;
+	else if ( SingleStep  || Paused )
+		IncrementMult = 0.0;
+}
+void rotateMenu( int item )
+{
+	cba.RotateClick( item );
+	if ( SingleStep  || Paused )
+		IncrementMult = 0.0;
+}
+void panMenu( int item )
+{
+	cba.PanClick( item );
+	if ( SingleStep  || Paused )
+		IncrementMult = 0.0;
+}
+void objectViewMenu( int item )
+{
+	cba.ObjectViewClick( item );
+	if ( SingleStep  || Paused )
+		IncrementMult = 0.0;
+}
+void mainmenu( int item )
+{
+	if ( item == 1 )
+		exit(0);
+}
 
 /*******************************************************************************
 * Author: Anthony Morast, Samuel Carroll
@@ -260,7 +258,6 @@ void display( void )
 			break;
 		case TextureMap:
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-			glShadeModel( GL_SMOOTH );
 			break;
 	}
 
@@ -272,100 +269,11 @@ void display( void )
 	glRotatef( RotateY, 1.0, 0.0, 0.0 );
 	glRotatef( RotateZ, 0.0, 0.0, 1.0 );
 	
-    // Draw the sun	depending on current texture mode
-	//glClear( GL_DEPTH_BUFFER_BIT );
-	GLUquadric *quad = gluNewQuadric();
-	if( texture != TextureMap )
-	{
-    	glColor3f( 1.0, 1.0, 0.0 );
-	}
-	else 
-	{
-		Planet p = Planets[0];
-		unsigned char* img = p.getImage().ptr;
-		int nrows = p.getImage().rows, ncols = p.getImage().cols;
-		gluQuadricTexture ( quad, GL_TRUE );
-		glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
-					  GL_RGB, GL_UNSIGNED_BYTE, img );
-		glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-	}
-    gluSphere( quad, 20, 20, 20 );
-	if( LightsEnabled )
-	{
-		// light for the sun -- I don't think this is position correctly
-		glEnable( GL_LIGHT0 );
-		GLfloat la[4] = { .5, .5, .5, 1.0 }; // ambient light
-		GLfloat ld[4] = { 1.0, 1.0, 0.5, 1.0 }; // diffuse light
-		GLfloat ls[4] = { 1.0, 1.0, 0.5, 1.0 }; // specular light
-		GLfloat lp[4] = { 1.0, 1.0, 0.0, 1.0 }; // light position
-	
-		// create sun light source
-		glLightfv( GL_LIGHT0, GL_AMBIENT, la );
-		glLightfv( GL_LIGHT0, GL_DIFFUSE, ld );
-		glLightfv( GL_LIGHT0, GL_SPECULAR, ls );
-		glLightfv( GL_LIGHT0, GL_POSITION, lp );
-	}
-	
+	Planets[0].DrawSun();
 	for (int i = 1; i < 9; i++)
 	{
-		GLUquadric *quad = gluNewQuadric();
 		Planet &p = Planets[i];
-
-		// select multiplier to prevent ridiculous spinning
-		p.hourOfDay += p.animateIncrement*(IncrementMult > 0.25 ? IncrementMult : 0.5);
-		p.dayOfYear = p.dayOfYear + ((p.animateIncrement*IncrementMult) / p.getDay());
-		p.hourOfDay = p.hourOfDay - ( (int)( p.hourOfDay / p.getDay() ) ) * p.getDay();
-		p.dayOfYear = p.dayOfYear - ( (int)( p.dayOfYear / p.getYear() ) ) * p.getYear();
-	
-		glPushMatrix();
-		if ( texture != TextureMap )
-		{
-			Color c = p.getColor();
-			glColor3f( c.r, c.g, c.b ); 
-		}
-		else 
-		{
-			// map the BMPs to the planets if in TextureMap mode
-			unsigned char* img = p.getImage().ptr;
-			int nrows = p.getImage().rows, ncols = p.getImage().cols;
-			gluQuadricTexture (quad, GL_TRUE);
-			glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
-						  GL_RGB, GL_UNSIGNED_BYTE, img );
-			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-		}
-		glRotatef( 360.0 * p.dayOfYear / p.getYear(), 0.0, 1.0, 0.0 );
-		glTranslatef( (30.0*i)+(p.getDistance()/100.0), 0.0, 0.0 );		
-		if( p.getName() == "Earth" )
-			glPushMatrix();
-		// rotation on the planet's axis
-		glRotatef( 360.0 * p.hourOfDay / p.getDay(), 0.0, 1.0, 0.0 );
-		gluSphere( quad, p.getScaledSize(), 15, 15 );
-		// draw the moon if earth
-		if( p.getName() == "Earth" )
-		{
-			glPopMatrix();
-			GLUquadric *moonq = gluNewQuadric();
-    		glRotatef( 360.0 * 12.0 * p.dayOfYear / 365.0, 0.0, 1.0, 0.0 );
-	   	 	glTranslatef( p.getScaledSize() + 1.1, 0.0, 0.0 );
-			Planet moon = Planets[9];
-			// handle moons texture
-			if( texture != TextureMap )
-			{
-				Color mc = moon.getColor();
-				glColor3f( mc.r, mc.g, mc.b );
-			}
-			else 
-			{	
-				unsigned char* img = moon.getImage().ptr;
-				int nrows = moon.getImage().rows, ncols = moon.getImage().cols;
-				gluQuadricTexture (moonq, GL_TRUE);
-				glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
-							  GL_RGB, GL_UNSIGNED_BYTE, img );
-				glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-			}
-   			gluSphere( moonq, moon.getScaledSize(), 10, 10 );
-		}
-		glPopMatrix();
+		p.Draw( i );
 	}
 
 	glFlush();
@@ -403,6 +311,7 @@ void reshape( int w, int h )
     glMatrixMode( GL_MODELVIEW );
 }
 
+
 /*******************************************************************************
  * 									Misc.									   *
  ******************************************************************************/
@@ -434,6 +343,7 @@ void init()
 	glutSpecialFunc( special );
 	glutReshapeFunc( reshape );
 	glutKeyboardFunc( keyboard );
+	glutMouseFunc( mouseclick );
 	
 	// enable texture tpye attributes
 	glEnable( GL_DEPTH_TEST );
@@ -445,8 +355,9 @@ void init()
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 
-	// create the light sources
+	// create the ambient light source and menus
 	CreateLights();
+	CreateMenus();
 
 	// init to the wireframe model
 	texture = Wireframe;
@@ -456,10 +367,7 @@ void init()
 * Author: Anthony Morast, Samuel Carroll
 * \brief Creates the light sources for our simulation
 *
-* Creates the light sources in the simulation. There are two primary light 
-* sources used. Ambient light throught the entire scene and the sun. The sun
-* emits primarily yellow light but some blue is included so Neptune and Uranus
-* aren't green. 
+* Creates the light ambient ligh source in the simulation. 
 *
 * \params none
 * \return none
@@ -476,4 +384,60 @@ void CreateLights()
 	// ambient light - weighted more towards yellow because of sun
 	GLfloat lv[4] = { 0.2, 0.2, 0.2, 1.0 };
 	glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lv );
+}
+
+/*******************************************************************************
+* Author: Anthony Morast, Samuel Carroll
+* \brief Creats the main menu and multiple submenus
+*
+* Creates the main menu mostly comprised of submenus. The submenus allow for 
+* a division between different types of actions. 
+*
+* \params none
+* \return none
+*******************************************************************************/
+void CreateMenus()
+{
+	int value = 1;
+	int animateMenu = glutCreateMenu( animationMenu );
+	glutAddMenuEntry( "Toggle Lights (l)", value++ );
+	glutAddMenuEntry( "Toggle Single Step Mode (s)", value++ );
+	glutAddMenuEntry( "Take Step (<space>)", value++ );
+	glutAddMenuEntry( "Toggle Pause (r)", value++ );
+	glutAddMenuEntry( "Increase Animation Speed (A)", value++ );
+	glutAddMenuEntry( "Decrease Animation Speed (a)", value++ );
+	
+	value = 1;
+	int rotatemenu = glutCreateMenu( rotateMenu );
+	glutAddMenuEntry( "Rotate X+ (X)", value++ );
+	glutAddMenuEntry( "Rotate X- (x)", value++ );
+	glutAddMenuEntry( "Rotate Y+ (Y)", value++ );
+	glutAddMenuEntry( "Rotate Y- (y)", value++ );
+	glutAddMenuEntry( "Rotate Z+ (Z)", value++ );
+	glutAddMenuEntry( "Rotate Z- (z)", value++ );
+
+	value = 1;
+	int panmenu = glutCreateMenu( panMenu );
+	glutAddMenuEntry( "Pan Left (LeftArrow)", value++ );
+	glutAddMenuEntry( "Pan Right (RightArrow)", value++ );
+	glutAddMenuEntry( "Pan Up (UpArrow)", value++ );
+	glutAddMenuEntry( "Pan Down (DownArrow)", value++ );
+	glutAddMenuEntry( "Zoom In (+)", value++ );
+	glutAddMenuEntry( "Zoom Out (-)", value++ );
+	
+	value = 1;
+	int objectview = glutCreateMenu( objectViewMenu );
+	glutAddMenuEntry( "Wireframe Objects (w)", value++ );
+	glutAddMenuEntry( "Toggle Smooth/Flat Shading (f)", value++ );
+	glutAddMenuEntry( "Texture Mapped (t)", value++ );
+	
+	value = 1;
+	glutCreateMenu( mainmenu );
+	glutAddSubMenu( "Simulation Options", animateMenu );
+	glutAddSubMenu( "Rotate Scene", rotatemenu );
+	glutAddSubMenu( "Panning/Zooming", panmenu );
+	glutAddSubMenu( "Change Object View", objectview );
+	glutAddMenuEntry( "Exit (esc)", value++ );
+	
+	glutAttachMenu( GLUT_RIGHT_BUTTON );
 }
