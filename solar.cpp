@@ -208,3 +208,8 @@ void InitPlanetOrbitPosition()
 		p.dayOfYear = rand() % (int)p.getYear();
 	}
 }
+
+void SetPlanetOrbitPoints() 
+{
+	
+}

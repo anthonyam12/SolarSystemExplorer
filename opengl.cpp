@@ -279,6 +279,20 @@ void display( void )
 		p.Draw( i );
 	}
 
+	glColor3f( 0.0, 1.0, 0.0 );
+	for ( int i = 1; i < 9; i++ )
+	{
+		Planet &p = Planets[i];
+		float baseDistance = (20.0*i)+(p.getDistance()/10.0);
+		// draw rings
+		glPushMatrix();
+			GLUquadric *orbit = gluNewQuadric();
+			gluQuadricOrientation( orbit, GLU_INSIDE );
+			glRotatef( 90.0, 1, 0, 0 );
+			gluCylinder( orbit,  baseDistance, baseDistance+.001, .0001, 80, 80 );	
+		glPopMatrix();
+	}
+
 	glFlush();
 	glutSwapBuffers();
 	
@@ -309,7 +323,7 @@ void reshape( int w, int h )
 	// adjust projection based on new screen size
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();	
-	gluPerspective( 60, aspectRatio, 1, 1000 ); 
+	gluPerspective( 60, aspectRatio, 1, 2000 ); 
 	
     glMatrixMode( GL_MODELVIEW );
 }

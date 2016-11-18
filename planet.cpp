@@ -95,12 +95,13 @@ void Planet::Draw( int i )
 		glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 	}
 	glRotatef( 360.0 * dayOfYear / getYear(), 0.0, 1.0, 0.0 );
-	glTranslatef( (30.0*i)+(getDistance()/100.0), 0.0, 0.0 );		
+	glTranslatef( (20.0*i)+(getDistance()/10.0), 0.0, 0.0 );
 	if( getName() == "Earth" )
 		glPushMatrix();
 	// rotation on the planet's axis
 	glRotatef( 360.0 * hourOfDay / getDay(), 0.0, 1.0, 0.0 );
 	gluSphere( quad, getScaledSize(), 15, 15 );
+
 	glColor3f( 0.0, 1.0, 0.0 );
 	glRasterPos3f( 0.0, getScaledSize()*1.2, 0.0 );
 	glutBitmapString( GLUT_BITMAP_9_BY_15, (const unsigned char*)name.c_str() );
@@ -128,6 +129,9 @@ void Planet::Draw( int i )
 			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 		}
  		gluSphere( moonq, moon.getScaledSize(), 10, 10 );
+		glColor3f( 0.0, 1.0, 0.0 );
+		glRasterPos3f( 0.0, moon.getScaledSize()*1.2, 0.0 );
+		glutBitmapString( GLUT_BITMAP_9_BY_15, (const unsigned char*)moon.getName().c_str() );
 	}
 	glPopMatrix();
 }
