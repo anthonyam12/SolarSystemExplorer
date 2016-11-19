@@ -276,7 +276,7 @@ void display( void )
 	{
 		Planet &p = Planets[i];
 		float baseDistance = (20.0*i)+(p.getDistance()/10.0);
-		// draw rings
+		// draw orbits
 		glPushMatrix();
 			GLUquadric *orbit = gluNewQuadric();
 			gluQuadricOrientation( orbit, GLU_INSIDE );

@@ -120,6 +120,7 @@ void CreatePlanetArray()
 	Planet neptune = Planet( 24750, 4493, 60195, 15.8, 24750.0/sunSize, "Neptune", color );
 	color.r = .8039; color.g = .7882; color.b = .7882;
 	Planet moon = Planet( 1738, 0.384, 27.3, 27.3, 1738.0/sunSize, "Moon", color );
+	Planet rings = Planet( 60000, 0.09, 0, 10.2, 50000.0/sunSize, "Rings", color );
 
 	// fill the Planets array
 	Planets[0] = sun;
@@ -132,9 +133,10 @@ void CreatePlanetArray()
 	Planets[7] = uranus;
 	Planets[8] = neptune;
 	Planets[9] = moon;
+	Planets[10] = rings;
 
 	// clip the planets' scaled size and increase for our larger display
-	for( int i = 1; i < 10; i++ ) 
+	for( int i = 1; i < 11; i++ ) 
 	{
 		if( Planets[i].getScaledSize() > 1.0)
 			Planets[i].setScaledSize( 1.0 );
@@ -185,6 +187,8 @@ void SetPlanetBitmaps()
 	Planets[8].setImage( img, rows, cols );
 	LoadBmpFile( "img/moon.bmp", rows, cols, img );
 	Planets[9].setImage( img, rows, cols );
+	LoadBmpFile( "img/saturnrings.bmp", rows, cols, img );
+	Planets[10].setImage( img, rows, cols );
 }
 
 /*******************************************************************************

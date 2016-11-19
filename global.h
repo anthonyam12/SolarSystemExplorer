@@ -18,7 +18,7 @@
 #include <stdio.h>			// files
 #include <stdlib.h>			// random
 #include <time.h>			// random seed
-#include <GL/freeglut.h>	// glut
+#include <GL/freeglut.h>		// glut
 
 using namespace std;
 
@@ -118,22 +118,22 @@ enum Texture { Wireframe, Flat, Smooth, TextureMap };
 int ScreenWidth = 1200;			// initial screen width
 int ScreenHeight = 600;			// initial screen height
 float CamZ = -100.0;			// initial 'zoom' value, 
-								//  need to back the camera off to see the scene
-float CamY = 0.0;				// initial camera translation in the y dir
-float CamX = 0.0;				// initial camera translation in the x dir
+					//  need to back the camera off to see the scene
+float CamY = 0.0;			// initial camera translation in the y dir
+float CamX = 0.0;			// initial camera translation in the x dir
 float IncrementMult = 1.0;		// increased/decreased to control animation speed
 bool SingleStep = false;		// toggles our single step mode
 bool Paused = false;			// toggles our Pause state
 float PreviousMult = 1.0;		// when coming out of Paused or Single Step mode
-								//   this is used to restore animation speed
+					//   this is used to restore animation speed
 float RotateX = 0.0;			// initial camera x rotation
 float RotateY = 15.0;			// initial camera y rotation
 float RotateZ = 0.0;			// initial camera z rotation
 bool LightsEnabled = true;		// used to determine if our lights are toggled on or off
-float StartX = 0;				// used to rotate via mouse movement
-float StartY = 0;				// used to rotate via mouse movement
+float StartX = 0;			// used to rotate via mouse movement
+float StartY = 0;			// used to rotate via mouse movement
 
-Planet Planets[10];				// stores the celestial objects
-Texture texture;				// the current texture state of the simulation
+Planet Planets[11];			// stores the celestial objects
+Texture texture;			// the current texture state of the simulation
 CallbackAction cba;
 #endif 

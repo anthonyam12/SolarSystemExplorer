@@ -17,7 +17,7 @@
 #include "opengl.h"
 
 // GLOBALS
-extern Planet Planets[10];
+extern Planet Planets[11];
 extern int ScreenHeight;
 extern int ScreenWidth;
 

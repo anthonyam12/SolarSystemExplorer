@@ -19,7 +19,7 @@
 
 // GLOBALS
 // external globals from global.h
-extern Planet Planets[10];
+extern Planet Planets[11]; //need to turn up to 11
 extern int ScreenHeight;
 extern int ScreenWidth;
 extern Texture texture;

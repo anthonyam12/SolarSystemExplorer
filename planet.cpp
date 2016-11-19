@@ -96,7 +96,7 @@ void Planet::Draw( int i )
 	}
 	glRotatef( 360.0 * dayOfYear / getYear(), 0.0, 1.0, 0.0 );
 	glTranslatef( (20.0*i)+(getDistance()/10.0), 0.0, 0.0 );
-	if( getName() == "Earth" )
+	if( getName() == "Earth" || getName() == "Saturn" )
 		glPushMatrix();
 	// rotation on the planet's axis
 	glRotatef( 360.0 * hourOfDay / getDay(), 0.0, 1.0, 0.0 );
@@ -109,6 +109,40 @@ void Planet::Draw( int i )
 	glutBitmapString( GLUT_BITMAP_9_BY_15, (const unsigned char*)name.c_str() );
 	if( texture == TextureMap )
 		glEnable( GL_TEXTURE_2D );
+
+	// draw rings if saturn
+	if( getName() == "Saturn")
+	{
+		glPopMatrix();
+		GLUquadric *ringsq = gluNewQuadric();
+   		
+   	 	glTranslatef( getScaledSize() - 9.4, 0.0, 0.0 );
+		glRotatef( 87.5, 1, 0, 0 );
+
+		Planet rings = Planets[10];
+
+		if ( texture != TextureMap )
+		{
+			Color rc = rings.getColor();
+			glColor3f( rc.r, rc.g, rc.b );
+		}
+		else
+		{
+			unsigned char* imgr = rings.getImage().ptr;
+			int nrows = rings.getImage().rows, ncols = rings.getImage().cols;
+			gluQuadricTexture (ringsq, GL_TRUE);
+			glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0,
+						  GL_RGB, GL_UNSIGNED_BYTE, imgr );
+			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+		}
+ 		gluCylinder( ringsq,  rings.getScaledSize(), rings.getScaledSize() * 1.45, 0.2, 20, 80 );	
+		glDisable( GL_TEXTURE_2D );
+		glColor3f( 0.0, 1.0, 0.0 );
+		glRasterPos3f( 0.0, rings.getScaledSize()*1.2, 0.0 );
+		
+		if ( texture == TextureMap )
+			glEnable( GL_TEXTURE_2D );
+	}
 	
 	// draw the moon if earth
 	if( getName() == "Earth" )

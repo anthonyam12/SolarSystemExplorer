@@ -22,7 +22,7 @@ f			- toggle flat/smooth shading of polygons
 t			- toggle texture mapping
 A/a			- speed up/slow down animation
 r			- suspend/resume animation
-s			- single step simulation
+s			- single step simulation (press space to step)
 Esc			- quit
 
 Panning may also be accomplished by clicking the left mouse button and dragging.
