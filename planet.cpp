@@ -109,6 +109,38 @@ void Planet::Draw( int i )
 	glutBitmapString( GLUT_BITMAP_9_BY_15, (const unsigned char*)name.c_str() );
 	if( texture == TextureMap )
 		glEnable( GL_TEXTURE_2D );
+	
+	// draw the moon if earth
+	if( getName() == "Earth" )
+	{
+		glPopMatrix();
+		GLUquadric *moonq = gluNewQuadric();
+   		glRotatef( 360.0 * 12.0 * dayOfYear / 365.0, 0.0, 1.0, 0.0 );
+   	 	glTranslatef( getScaledSize() + 1.1, 0.0, 0.0 );
+		Planet moon = Planets[9];
+		// handle moons texture
+		if( texture != TextureMap )
+		{
+			Color mc = moon.getColor();
+			glColor3f( mc.r, mc.g, mc.b );
+		}
+		else
+		{	
+			unsigned char* imgm = moon.getImage().ptr;
+			int nrows = moon.getImage().rows, ncols = moon.getImage().cols;
+			gluQuadricTexture (moonq, GL_TRUE);
+			glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
+						  GL_RGB, GL_UNSIGNED_BYTE, imgm );
+			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+		}
+ 		gluSphere( moonq, moon.getScaledSize(), 10, 10 );
+		glDisable( GL_TEXTURE_2D );
+		glColor3f( 0.0, 1.0, 0.0 );
+		glRasterPos3f( 0.0, moon.getScaledSize()*1.2, 0.0 );
+		glutBitmapString( GLUT_BITMAP_9_BY_15, (const unsigned char*)moon.getName().c_str() );
+		if ( texture == TextureMap )
+			glEnable( GL_TEXTURE_2D );
+	}
 
 	// draw rings if saturn
 	if( getName() == "Saturn")
@@ -143,38 +175,7 @@ void Planet::Draw( int i )
 		if ( texture == TextureMap )
 			glEnable( GL_TEXTURE_2D );
 	}
-	
-	// draw the moon if earth
-	if( getName() == "Earth" )
-	{
-		glPopMatrix();
-		GLUquadric *moonq = gluNewQuadric();
-   		glRotatef( 360.0 * 12.0 * dayOfYear / 365.0, 0.0, 1.0, 0.0 );
-   	 	glTranslatef( getScaledSize() + 1.1, 0.0, 0.0 );
-		Planet moon = Planets[9];
-		// handle moons texture
-		if( texture != TextureMap )
-		{
-			Color mc = moon.getColor();
-			glColor3f( mc.r, mc.g, mc.b );
-		}
-		else
-		{	
-			unsigned char* imgm = moon.getImage().ptr;
-			int nrows = moon.getImage().rows, ncols = moon.getImage().cols;
-			gluQuadricTexture (moonq, GL_TRUE);
-			glTexImage2D( GL_TEXTURE_2D, 0, 3, ncols, nrows, 0, 
-						  GL_RGB, GL_UNSIGNED_BYTE, imgm );
-			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
-		}
- 		gluSphere( moonq, moon.getScaledSize(), 10, 10 );
-		glDisable( GL_TEXTURE_2D );
-		glColor3f( 0.0, 1.0, 0.0 );
-		glRasterPos3f( 0.0, moon.getScaledSize()*1.2, 0.0 );
-		glutBitmapString( GLUT_BITMAP_9_BY_15, (const unsigned char*)moon.getName().c_str() );
-		if ( texture == TextureMap )
-			glEnable( GL_TEXTURE_2D );
-	}
+
 	glPopMatrix();
 }
 
