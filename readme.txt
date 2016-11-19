@@ -8,22 +8,23 @@ The Sun is displayed at 1/10 its actual size, and Jupiter and Saturn are display
 
 To Do
 -----
-Texture map rings of Saturn properly.
+Texture map rings of Saturn properly, currently go center out
 
 Key Assignments
 ---------------
 +/-			- zoom in/out
-UpArrow/DownArrow	- rotate up/down
+UpArrow/DownArrow	- pan up/down
 RightArrow/LeftArrow	- pan right/left
-X/x/Y/y/Z/z		- pan in X/Y/Z directions
+X/x/Y/y/Z/z		- rotate in X/Y/Z directions
 N/n			- increase/decrease resolution of spheres
-p/w			- toggle wireframe/polygon rendering
-f			- toggle flat/smooth shading of polygons
-t			- toggle texture mapping
+p/w			- activate wireframe/polygon rendering
+f			- activate/toggle flat/smooth shading of polygons
+t			- activate texture mapping
 A/a			- speed up/slow down animation
 r			- suspend/resume animation
 s			- single step simulation (press space to step)
+			  NOTE: dependent on animation speed
 Esc			- quit
 
-Panning may also be accomplished by clicking the left mouse button and dragging.
+Rotation may also be accomplished by clicking the left mouse button and dragging.
 Commands may also be issued via a popup menu, accessed by clicking the right mouse button.
