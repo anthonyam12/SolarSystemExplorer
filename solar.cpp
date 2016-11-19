@@ -120,6 +120,7 @@ void CreatePlanetArray()
 	Planet neptune = Planet( 24750, 4493, 60195, 15.8, 24750.0/sunSize, "Neptune", color );
 	color.r = .8039; color.g = .7882; color.b = .7882;
 	Planet moon = Planet( 1738, 0.384, 27.3, 27.3, 1738.0/sunSize, "Moon", color );
+	color.r = .8549; color.g = .6471; color.b = .1254;
 	Planet rings = Planet( 60000, 0.09, 0, 10.2, 50000.0/sunSize, "Rings", color );
 
 	// fill the Planets array

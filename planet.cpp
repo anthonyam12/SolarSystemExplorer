@@ -167,7 +167,7 @@ void Planet::Draw( int i )
 						  GL_RGB, GL_UNSIGNED_BYTE, imgr );
 			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
 		}
- 		gluCylinder( ringsq,  rings.getScaledSize(), rings.getScaledSize() * 1.45, 0.2, 20, 80 );	
+ 		gluCylinder( ringsq,  rings.getScaledSize(), rings.getScaledSize() * 1.45, 0.2, 20, 20 );	
 		glDisable( GL_TEXTURE_2D );
 		glColor3f( 0.0, 1.0, 0.0 );
 		glRasterPos3f( 0.0, rings.getScaledSize()*1.2, 0.0 );
