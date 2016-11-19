@@ -148,7 +148,7 @@ void Planet::Draw( int i )
 		glPopMatrix();
 		GLUquadric *ringsq = gluNewQuadric();
    		
-   	 	glTranslatef( getScaledSize() - 9.4, 0.0, 0.0 );
+   	 	glTranslatef( getScaledSize() - 9.5, 0.0, 0.0 );
 		glRotatef( 87.5, 1, 0, 0 );
 
 		Planet rings = Planets[10];
