@@ -41,6 +41,7 @@
 * Known Bugs:
 *	- pan, rotate seem to act a bit funky
 *	- rotate x curves
+*	- mapping seems to be sideways
 *
 * Potential Improvements
 *
